@@ -1,0 +1,36 @@
+<?php
+
+global $_MODULE;
+$_MODULE = array();
+$_MODULE['<{decidir}prestashop>decidir_37de7f579132896e8678668c436e7933'] = 'Tarjeta de crédito (Decidir)';
+$_MODULE['<{decidir}prestashop>cbs-retail_9b7ccbda7073f6ae470fbad435accb8f'] = 'Sin descripción';
+$_MODULE['<{decidir}prestashop>config_2daf1cb573c2c61422faf64610cf9402'] = 'Credenciales';
+$_MODULE['<{decidir}prestashop>config_2652eec977dcb2a5aea85f5bec235b05'] = 'Sandbox';
+$_MODULE['<{decidir}prestashop>config_93cba07454f06a4a960172bbd6e2a435'] = 'Sí';
+$_MODULE['<{decidir}prestashop>config_bafd7322c6e97d25b6299b5d6fe8920b'] = 'No';
+$_MODULE['<{decidir}prestashop>config_c9cc8cce247e49bae79f15173ce97354'] = 'Guardar';
+$_MODULE['<{decidir}prestashop>config_e68ade2f54420c7a302865af04bd321f'] = 'Habilitar Cybersource';
+$_MODULE['<{decidir}prestashop>config_992a0f0542384f1ee5ef51b7cf4ae6c4'] = 'Servicios';
+$_MODULE['<{decidir}prestashop>config_a240fa27925a635b08dc28c9e4f9216d'] = 'Pedido';
+$_MODULE['<{decidir}prestashop>config_b78a3223503896721cca1303f776159b'] = 'Título';
+$_MODULE['<{decidir}prestashop>config_4d3df28e3e68ed692ae51475bbe0860d'] = 'Tarjetas de crédito';
+$_MODULE['<{decidir}prestashop>config_ba5376b5ba3216a7a51eabb18265d921'] = 'Cuotas';
+$_MODULE['<{decidir}prestashop>error_9bb1625183807c8798d8fa98f6336103'] = 'Ha ocurrido un error al procesar su pago. Por favor contáctese con nosotros para resolverlo lo antes posible.';
+$_MODULE['<{decidir}prestashop>error_ca0dbad92a874b2f69b549293387925e'] = 'Código';
+$_MODULE['<{decidir}prestashop>error_a254c25adc7d10d7e9c4889484f875a5'] = 'Detalle';
+$_MODULE['<{decidir}prestashop>error_988fd738de9c6d177440c5dcf69e73ce'] = 'Volver';
+$_MODULE['<{decidir}prestashop>exists_037524e45a715bce357baca9d4c5bd4b'] = 'Este pedido ya ha sido procesado.';
+$_MODULE['<{decidir}prestashop>options_089533c7eb001f353809f661e252a7c3'] = 'Nombre (Como aparece en la tarjeta)';
+$_MODULE['<{decidir}prestashop>options_4c2a904bafba06591225113ad17b5cec'] = 'Juan Perez';
+$_MODULE['<{decidir}prestashop>options_208a23b4a66a2500d7f1e5868af58e3b'] = 'Tipo';
+$_MODULE['<{decidir}prestashop>options_14c44ffb79e2c416100024bd491b48b9'] = 'Número de documento';
+$_MODULE['<{decidir}prestashop>options_707f0c56eea47eff25f0e4c8755d5434'] = 'Número de tarjeta';
+$_MODULE['<{decidir}prestashop>options_51360304ea03557e79bdf5ff9cd2e234'] = 'Expedida por';
+$_MODULE['<{decidir}prestashop>options_8c1279db4db86553e4b9682f78cf500e'] = 'Fecha de expiración';
+$_MODULE['<{decidir}prestashop>options_16aefbf48d8803216285343472025aed'] = 'MM/AA';
+$_MODULE['<{decidir}prestashop>options_ace8d9857b85e8793231d446ee0eea27'] = 'Número de verificación';
+$_MODULE['<{decidir}prestashop>options_ba5376b5ba3216a7a51eabb18265d921'] = 'Cuotas';
+$_MODULE['<{decidir}prestashop>rejected_73d669aa1b04785b75def7f6b2379dcc'] = 'Su pago ha sido rechazado';
+$_MODULE['<{decidir}prestashop>rejected_22b653bd8d2edcebb9e0036b4ac79262'] = 'Volver';
+$_MODULE['<{decidir}prestashop>success_3f386245ff8753f9aedad8520227444e'] = 'Tu pedido ha sido confirmado!';
+$_MODULE['<{decidir}prestashop>success_f92965e2c8a7afb3c1b9a5c09a263636'] = 'Finalizar';
