@@ -348,8 +348,14 @@ class Decidir extends PaymentModule
             $s = $ost->decidir_state;
             array_push($sts, $s);
         }
+        if (!in_array('processing', $sts)) {
+            $this->createOrderState('processing', 'Decidir - Processing', true);
+        }
         if (!in_array('approved', $sts)) {
             $this->createOrderState('approved', 'Decidir - Approved', true);
+        }
+        if (!in_array('rejected', $sts)) {
+            $this->createOrderState('rejected', 'Decidir - Rejected', true);
         }
     }
     

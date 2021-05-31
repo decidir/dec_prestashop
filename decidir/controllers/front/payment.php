@@ -62,56 +62,67 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             
             // Order data
             $total = $cart->getOrderTotal(true, Cart::BOTH);
+            $refer = Order::generateReference();
             
-            // Payment data
+            // DECIDIR PAYMENT
             $pmnt = array();
-            $pmnt['site_transaction_id'] = (string)$cart->id.'-'.time();
+            $pmnt['site_transaction_id'] = $refer;
             $pmnt['token'] = (string)$prms['decidir-card-token'];
             $pmnt['payment_method_id'] = (int)$prms['decidir-method-id'];
             $pmnt['bin'] = (string)$prms['decidir-card-bin'];
             $pmnt['amount'] = (int)number_format($total, 2, '', '');
             $pmnt['currency'] = (string)$curr->iso_code;
-            $pmnt['installments'] = (int) $prms['decidir-installments'];
+            $pmnt['installments'] = (int)$prms['decidir-installments'];
             $pmnt['payment_type'] = 'single';
             $pmnt['establishment_name'] = (string)$shop->name;
             $pmnt['sub_payments'] = array();
-            
-            // CYBERSOURCE
             if ($data->cbs) {
                 require_once "{$data->pth}/includes/cbs-retail.php";
             }
-            
             $res = $modu->callAPI('payments', $pmnt);
             $data->res = $res;
-            $data->prm = $prms;
-            $data->pmn = $pmnt;
-            $data->cnm = $prms['decidir-card-number'];
-            $data->cart = $cart;
             
+            // PS ORDER
             if (isset($res->id)) {
                 $status = $res->status;
+                $ost = $modu->getOrderState('processing');
+                
+                // Status rejected
+                if ($status == 'rejected') {
+                    $ost = $modu->getOrderState('rejected');
+                }
+                
+                // Status approved
+                if ($status == 'approved') {
+                    $ost = $modu->getOrderState('approved');
+                }
+                
+                // Generate order
+                $modu->validateOrder($cart->id, $ost, $total, $data->ttl, null, [], null, false, $cart->secure_key);
+                $oid = Order::getOrderByCartId($cart->id);
+                $ord = new Order($oid);
+                $ord->reference = $refer;
+                $ord->save();
+                
+                // Generate payment
+                $pay = new OrderPayment();
+                $pay->order_reference = $ord->reference;
+                $pay->id_currency = $curr->id;
+                $pay->amount = $total;
+                $pay->payment_method = $data->ttl;
+                $pay->transaction_id = $res->id;
+                $pay->card_brand = Tools::getValue('decidir-method-name');
+                $pay->card_expiration = Tools::getValue('decidir-expir');
+                $pay->card_holder = Tools::getValue('decidir-holder');
+                $pay->save();
+                
+                // Show rejected view
                 if ($status == 'rejected') {
                     $this->loadPageTemplate('front', 'rejected', $data);
                 }
+                
+                // Show approved view
                 if ($status == 'approved') {
-                    $ost = $modu->getOrderState('approved');
-                    
-                    // VALIDATE ORDER
-                    $modu->validateOrder($cart->id, $ost, $total, $data->ttl, null, [], null, false, $cart->secure_key);
-                    $oid = Order::getOrderByCartId($cart->id);
-                    $ord = new Order($oid);
-                    
-                    $pay = new OrderPayment();
-                    $pay->order_reference = $ord->reference;
-                    $pay->id_currency = $curr->id;
-                    $pay->amount = $total;
-                    $pay->payment_method = $data->ttl;
-                    $pay->transaction_id = $res->id;
-                    $pay->card_brand = Tools::getValue('decidir-method-name');
-                    $pay->card_expiration = Tools::getValue('decidir-expir');
-                    $pay->card_holder = Tools::getValue('decidir-holder');
-                    $pay->save();
-                    
                     $url = 'index.php?controller=order-confirmation';
                     $url .= '&id_cart='.$cart->id;
                     $url .= '&id_module='.$modu->id;
@@ -120,6 +131,8 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
                     Tools::redirect($url);
                 }
             } else {
+                
+                // Payment error
                 $this->loadPageTemplate('front', 'error', $data);
             }
         }
