@@ -25,7 +25,7 @@
 
 <div class="alert alert-warning">
     <strong>{l s='Your payment was rejected.' mod='decidir'}.</strong>
-    <p style="margin-top: 20px;"><a class="btn btn-warning" href="javascript:history.back()">{l s='Return' mod='decidir'}</a></p>
+    <p style="margin-top: 20px;"><a class="btn btn-warning" href="{$data->url}">{l s='Done' mod='decidir'}</a></p>
 </div>
 <script>
 // Prevent form resend
