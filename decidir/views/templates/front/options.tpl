@@ -176,130 +176,138 @@ decidir.setPublishableKey(decidir_key);
 {/if}
 
 <script>
-setTimeout(function(){
-    
-    // Manage doc number
-    function docNumber() {
-        var ipt = $('#decidir-doc-number');
-        function mask() {
-            var el = $(this);
-            $(el).val($(el).val().replace(/\s/g, ''));
-            $(el).val($(el).val().replace(/-/g, ''));
-            $(el).val($(el).val().replace(/\./g, ''));
-            $(el).val($(el).val().replace(/[a-zA-Z]/g, ''));
-            $(el).val($(el).val().trim());
-        }
-        ipt.on('keyup', mask);
-        ipt.on('change', mask);
-        ipt.trigger('change');
-    } docNumber();
-    
-    // Manage card number
-    function cardNumber() {
-        var ipt = $('#decidir-card-number');
-        function mask() {
-            var el = $(this);
-            $(el).val($(el).val().replace(/\s/g, ''));
-            $(el).val($(el).val().replace(/-/g, ''));
-            $(el).val($(el).val().replace(/\./g, ''));
-            $(el).val($(el).val().replace(/[a-zA-Z]/g, ''));
-            var chr = $(el).val().split('');
-            if (chr.length > 4) chr.splice(4, 0, ' ');
-            if (chr.length > 8) chr.splice(9, 0, ' ');
-            if (chr.length > 12) chr.splice(14, 0, ' ');
-            if (chr.length > 16) chr.splice(19, 0, ' ');
-            var val = chr.join('').trim();
-            $(el).val(val);
-            val = val.replace(/\s+/g, '');
-            $('[name="decidir-card-number"]').val(val);
-        }
-        ipt.on('keyup', mask);
-        ipt.on('change', mask);
-        ipt.trigger('change');
-    } cardNumber();
-    
-    // Manage card expiration
-    function cardExpiration() {
-        var ipt = $('#decidir-expir');
-        function mask() {
-            var el = $(this);
-            $(el).val($(el).val().replace(/-/g, ''));
-            $(el).val($(el).val().replace(/\//g, ''));
-            $(el).val($(el).val().replace(/[a-zA-Z]/g, ''));
-            var chr = $(el).val().split('');
-            if (chr.length > 2) {
-                chr.splice(2, 0, '/');
+if (document.readyState != 'loading'){
+    setOptionDecidir();
+} else {
+    document.addEventListener
+    ('DOMContentLoaded', setOptionDecidir);
+}
+function setOptionDecidir() {
+    setTimeout(function(){
+        
+        // Manage doc number
+        function docNumber() {
+            var ipt = $('#decidir-doc-number');
+            function mask() {
+                var el = $(this);
+                $(el).val($(el).val().replace(/\s/g, ''));
+                $(el).val($(el).val().replace(/-/g, ''));
+                $(el).val($(el).val().replace(/\./g, ''));
+                $(el).val($(el).val().replace(/[a-zA-Z]/g, ''));
+                $(el).val($(el).val().trim());
             }
-            var val = chr.join('').trim();
-            $(el).val(val);
-            val = val.split('/');
-            $('[name="decidir-expir-m"]').val(val[0]||'');
-            $('[name="decidir-expir-y"]').val(val[1]||'');
-        }
-        ipt.on('keyup', mask);
-        ipt.on('change', mask);
-        ipt.trigger('change');
-    } cardExpiration();
-    
-    // Manage CVV
-    function cardCVV() {
-        var ipt = $('#decidir-cvv');
-        function mask() {
-            var el = $(this);
-            $(el).val($(el).val().replace(/\s/g, ''));
-            $(el).val($(el).val().replace(/[a-zA-Z]/g, ''));
-        }
-        ipt.on('keyup', mask);
-        ipt.on('change', mask);
-        ipt.trigger('change');
-    } cardCVV();
-    
-    // Manage payment method
-    function paymentMethod() {
-        var ipt = $('#decidir-method-id');
-        ipt.on('change', function(){
-            var txt = ipt.find('option:selected').text();
-            $('#decidir-method-name').val(txt);
-            
-            // Change debit installments
-            var debits = [31,105,106,108];
-            var this_crd = parseInt(ipt.val());
-            var is_debit = $.inArray(this_crd, debits);
-            if (is_debit > -1) {
-                $('#decidir-installments option').hide();
-                $('#decidir-installments').val(1).change();       
-                $('#decidir-installments option[value="1"]').show();
-            } else {
-                $('#decidir-installments option').show();
+            ipt.on('keyup', mask);
+            ipt.on('change', mask);
+            ipt.trigger('change');
+        } docNumber();
+        
+        // Manage card number
+        function cardNumber() {
+            var ipt = $('#decidir-card-number');
+            function mask() {
+                var el = $(this);
+                $(el).val($(el).val().replace(/\s/g, ''));
+                $(el).val($(el).val().replace(/-/g, ''));
+                $(el).val($(el).val().replace(/\./g, ''));
+                $(el).val($(el).val().replace(/[a-zA-Z]/g, ''));
+                var chr = $(el).val().split('');
+                if (chr.length > 4) chr.splice(4, 0, ' ');
+                if (chr.length > 8) chr.splice(9, 0, ' ');
+                if (chr.length > 12) chr.splice(14, 0, ' ');
+                if (chr.length > 16) chr.splice(19, 0, ' ');
+                var val = chr.join('').trim();
+                $(el).val(val);
+                val = val.replace(/\s+/g, '');
+                $('[name="decidir-card-number"]').val(val);
             }
-            
-        }); ipt.trigger('change');
-    } paymentMethod();
-    
-    // VALIDATE AND SUBMIT
-    var decidir_valid = false;
-    var form = document.forms["decidir-form"];
-    form.onsubmit = function() {
-        $('.decidir-err').hide();
-        $('.decidir-invalid').removeClass('decidir-invalid');
-        decidir.createToken(form, function(sts, res){
-            if (sts == 200 || sts == 201) {
-                decidir_valid = true;
-                jQuery('#decidir-card-token').val(res.id);
-                jQuery('#decidir-card-bin').val(res.bin);
-                form.submit();
-            } else {
-                jQuery('.decidir-form-err').text(res.message);
+            ipt.on('keyup', mask);
+            ipt.on('change', mask);
+            ipt.trigger('change');
+        } cardNumber();
+        
+        // Manage card expiration
+        function cardExpiration() {
+            var ipt = $('#decidir-expir');
+            function mask() {
+                var el = $(this);
+                $(el).val($(el).val().replace(/-/g, ''));
+                $(el).val($(el).val().replace(/\//g, ''));
+                $(el).val($(el).val().replace(/[a-zA-Z]/g, ''));
+                var chr = $(el).val().split('');
+                if (chr.length > 2) {
+                    chr.splice(2, 0, '/');
+                }
+                var val = chr.join('').trim();
+                $(el).val(val);
+                val = val.split('/');
+                $('[name="decidir-expir-m"]').val(val[0]||'');
+                $('[name="decidir-expir-y"]').val(val[1]||'');
+            }
+            ipt.on('keyup', mask);
+            ipt.on('change', mask);
+            ipt.trigger('change');
+        } cardExpiration();
+        
+        // Manage CVV
+        function cardCVV() {
+            var ipt = $('#decidir-cvv');
+            function mask() {
+                var el = $(this);
+                $(el).val($(el).val().replace(/\s/g, ''));
+                $(el).val($(el).val().replace(/[a-zA-Z]/g, ''));
+            }
+            ipt.on('keyup', mask);
+            ipt.on('change', mask);
+            ipt.trigger('change');
+        } cardCVV();
+        
+        // Manage payment method
+        function paymentMethod() {
+            var ipt = $('#decidir-method-id');
+            ipt.on('change', function(){
+                var txt = ipt.find('option:selected').text();
+                $('#decidir-method-name').val(txt);
+                
+                // Change debit installments
+                var debits = [31,105,106,108];
+                var this_crd = parseInt(ipt.val());
+                var is_debit = $.inArray(this_crd, debits);
+                if (is_debit > -1) {
+                    $('#decidir-installments option').hide();
+                    $('#decidir-installments').val(1).change();       
+                    $('#decidir-installments option[value="1"]').show();
+                } else {
+                    $('#decidir-installments option').show();
+                }
+                
+            }); ipt.trigger('change');
+        } paymentMethod();
+        
+        // VALIDATE AND SUBMIT
+        var decidir_valid = false;
+        var form = document.forms["decidir-form"];
+        form.onsubmit = function() {
+            $('.decidir-err').hide();
+            $('.decidir-invalid').removeClass('decidir-invalid');
+            decidir.createToken(form, function(sts, res){
+                if (sts == 200 || sts == 201) {
+                    decidir_valid = true;
+                    jQuery('#decidir-card-token').val(res.id);
+                    jQuery('#decidir-card-bin').val(res.bin);
+                    form.submit();
+                } else {
+                    jQuery('.decidir-form-err').text(res.message);
+                    return false;
+                }
+            });
+            if (!decidir_valid) {
+                jQuery('#payment-confirmation button').prop('disabled', 1);
                 return false;
             }
-        });
-        if (!decidir_valid) {
-            jQuery('#payment-confirmation button').prop('disabled', 1);
-            return false;
         }
-    }
-    
-}, 0);
+        
+    },0);
+}
 </script>
 
 <style>
