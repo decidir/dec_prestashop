@@ -24,11 +24,15 @@
 *}
 
 <div class="alert alert-danger">
-    <strong>{l s='An error occurred while processing your payment. Please contact us to solve it as soon as possible.' mod='decidir'}.</strong>
+    <strong>{l s='An error occurred while processing your payment. Please check your data' mod='decidir'}.</strong>
     {if ($data->res->validation_errors)}
     <ul>
         {foreach from=$data->res->validation_errors item="error"}
-        <li><b>{l s='Code' mod='decidir'}:</b> {$error->code} | <b>{l s='Detail' mod='decidir'}:</b> {$error->param}</li>
+            {if ($error->code == 'invalid_param' && $error->param == 'payment_method_id')}
+            <li>{l s='Payment method invalid. Make sure your card and number are correct' mod='decidir'}.</li>
+            {else}
+            <li><b>{l s='Code' mod='decidir'}:</b> {$error->code} | <b>{l s='Detail' mod='decidir'}:</b> {$error->param}</li>
+            {/if}
         {/foreach}
     </ul>
     {/if}
