@@ -114,7 +114,7 @@ if ($data->vrt == 'retail') {
         if (!$p->description_short) {
             $p->description_short = $modu->l('No description');
         }
-        $item['description'] = $p->description_short;
+        $item['description'] = strip_tags($p->description_short);
         $item['name'] = $p->name;
         if (isset($p->attributes)) {
             $item['name'] .= $p->attributes;
