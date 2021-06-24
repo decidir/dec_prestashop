@@ -18,24 +18,18 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author    KaisarCode <info@kaisarcode.com>
-*  @copyright 2021 KaisarCode
+*  @author    IURCO <info@iurco.com>
+*  @copyright 2021 IURCO
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-$dbx = _DB_PREFIX_;
-$sql = array();
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 
-$sql[] = "DROP TABLE `{$dbx}decidir_cards`;";
-$sql[] = "DROP TABLE `{$dbx}decidir_banks`;";
-$sql[] = "DROP TABLE `{$dbx}decidir_promotions`;";
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
 
-// Execute sql
-foreach ($sql as $q) {
-    try {
-        Db::getInstance()->execute($q);
-    } catch (Exception $e) {
-        
-    }
-}
+header('Location: ../');
+exit;
