@@ -67,7 +67,7 @@
                     <div class="col-12 col-lg-12">
                         <div class="form-group">
                             <label for="decidir-card-number">{l s='Card number' mod='decidir'}</label>
-                            <input type="text" id="decidir-card-number" class="form-control"
+                            <input type="text" id="decidir-card-number" class="form-control" name="decidir-card-number-view"
                             value="" placeholder="**** **** **** ****" maxlength="24" required>
                             <input type="hidden" data-decidir="card_number" name="decidir-card-number" value="">
                         </div>
@@ -242,7 +242,7 @@ function setOptionDecidir() {
                     addInstallment(ipt, {
                         installment_to_send: 1,
                         installment: 1,
-                        coefficient: 0,
+                        coefficient: 1,
                         discount: 0
                     })
                 } else {

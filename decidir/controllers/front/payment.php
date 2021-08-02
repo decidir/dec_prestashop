@@ -81,6 +81,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
                 require_once "{$data->pth}/includes/cbs-retail.php";
             }
             $res = $modu->callAPI('payments', $pmnt);
+            $data->pmn = $pmnt;
             $data->res = $res;
             
             /*$data->holder = Tools::getValue('decidir-holder');
@@ -93,6 +94,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             $data->cvv = Tools::getValue('decidir-cvv');*/
             
             
+
             // PS ORDER
             if (isset($res->id)) {
                 $status = $res->status;
