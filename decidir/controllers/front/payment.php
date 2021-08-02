@@ -94,6 +94,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             $data->cvv = Tools::getValue('decidir-cvv');*/
             
             
+
             // PS ORDER
             if (isset($res->id)) {
                 $status = $res->status;
@@ -159,6 +160,8 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
                     $this->loadPageTemplate('front', 'error', $data);
                 }
             } else {
+                
+                // Payment error
                 $this->loadPageTemplate('front', 'error', $data);
             }
         }
