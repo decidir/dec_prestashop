@@ -34,14 +34,15 @@ class Decidir extends PaymentModule
     private $hooks = array(
         'payment',
         'paymentReturn',
-        'paymentOptions'
+        'paymentOptions',
+        'displayBackofficeHeader'
     );
     
     public function __construct()
     {
         $this->name = 'decidir';
         $this->displayName = $this->l('Decidir');
-        $this->description = $this->l('Prisma Decidir - Gateway de Pago');
+        $this->description = $this->l('Prisma Decidir - Payment Gateway');
         $this->paymentMethodName = $this->l('Credit Card (Decidir)');
         $this->tab = 'payments_gateways';
         $this->version = '1.0.0';
@@ -65,6 +66,7 @@ class Decidir extends PaymentModule
     public function setUp()
     {
         $data = new stdClass();
+        $this->getKeys($data);
         $data->mod = $this;
         $data->lnk = new Link();
         $data->ctx = Context::getContext();
@@ -76,9 +78,17 @@ class Decidir extends PaymentModule
         $data->shp = $data->ctx->shop->id;
         $data->ssl = Tools::usingSecureMode();
         $data->pay = $data->lnk->getModuleLink($this->name, 'payment', [], $data->ssl);
-        $this->getKeys($data);
+        $data->srv = $data->lnk->getModuleLink($this->name, 'spromotions', [], $data->ssl);
+        $data->srv .= "&decidir-token={$data->skey}";
         
         return $data;
+    }
+    
+    // BO HEADER
+    public function hookDisplayBackofficeHeader()
+    {
+        $data = $this->setUp();
+        return $this->displayTpl('admin/header', $data);
     }
     
     // CONFIG PAGE
@@ -89,6 +99,17 @@ class Decidir extends PaymentModule
         $this->updateKeys();
         $this->getKeys($data);
         $this->createOrderStates();
+        
+        // If credentials not set preselect the tab
+        $data->tab = Tools::getValue('decidir-tab');
+        !$data->tab && (
+        !Configuration::get('DECIDIR_KEY_PUB') ||
+        !Configuration::get('DECIDIR_KEY_PRV') ||
+        !Configuration::get('DECIDIR_KEY_PUB_SBX')||
+        !Configuration::get('DECIDIR_KEY_PRV_SBX'))&&
+        $data->tab = 'crds';
+        
+        // Display config
         return $this->displayTpl('admin/config', $data);
     }
     
@@ -109,6 +130,11 @@ class Decidir extends PaymentModule
         $cust = new Customer($cart->id_customer);
         $data->fname = $cust->firstname;
         $data->lname = $cust->lastname;
+        $data->total = $cart->getOrderTotal(true, Cart::BOTH);
+        $data->cards = $this->getCards();
+        $data->banks = $this->getBanks();
+        $curr = new Currency($cart->id_currency);
+        $data->curs = $curr->sign;
         $data->cart = $cart;
         $data->ins = explode(',', $data->ins);
         $data->crd = explode(',', $data->crd);
@@ -132,19 +158,20 @@ class Decidir extends PaymentModule
         $cust = new Customer($cart->id_customer);
         $data->fname = $cust->firstname;
         $data->lname = $cust->lastname;
+        $data->total = $cart->getOrderTotal(true, Cart::BOTH);
+        $data->cards = $this->getCards();
+        $data->banks = $this->getBanks();
+        $curr = new Currency($cart->id_currency);
+        $data->curs = $curr->sign;
         
-        $data->ins = explode(',', $data->ins);
-        $data->crd = explode(',', $data->crd);
-        $ctrl = 'payment';
-        $name = $this->name;
         $dnam = $data->ttl;
         $link = $data->pay;
         $tmpl = $this->displayTpl('front/options', $data);
-        
         $option = new \PrestaShop\PrestaShop\Core\Payment\PaymentOption();
-        $option->setAction($link);
         $option->setCallToActionText($dnam);
+        $option->setAction($link);
         $option->setForm($tmpl);
+        
         return [$option];
     }
     
@@ -162,11 +189,24 @@ class Decidir extends PaymentModule
         }
     }
     
+    // DISPLAY TEMPLATE
+    public function displayTpl($tpl, $data = null)
+    {
+        $name = $this->name;
+        $this->context->smarty->assign('data', $data);
+        if ($this->ps_version < 17) {
+            return $this->display(__FILE__, "/views/templates/$tpl.tpl");
+        } else {
+            return $this->fetch("module:$name/views/templates/$tpl.tpl");
+        }
+    }
+    
     // INSTALL MODULE
     public function install()
     {
         parent::install();
         $this->regHooks();
+        $this->installTabs();
         Configuration::updateValue('DECIDIR_SBX', 1);
         Configuration::updateValue('DECIDIR_CBS', 1);
         Configuration::updateValue('DECIDIR_VRT', 'retail');
@@ -179,6 +219,8 @@ class Decidir extends PaymentModule
     public function uninstall()
     {
         parent::uninstall();
+        $this->uninstallTabs();
+        $this->deleteOrderStates();
         include "{$this->path}/includes/uninstall.php";
         $this->deleteKeys();
         return true;
@@ -194,15 +236,118 @@ class Decidir extends PaymentModule
         }
     }
     
-    // DISPLAY TEMPLATE
-    private function displayTpl($tpl, $data = null)
+    // INSTALL TABS
+    public function installTabs()
     {
-        $name = $this->name;
-        $this->context->smarty->assign('data', $data);
-        if ($this->ps_version < 17) {
-            return $this->display(__FILE__, "/views/templates/$tpl.tpl");
-        } else {
-            return $this->fetch("module:$name/views/templates/$tpl.tpl");
+        $this->addTab($this->l('Prisma Decidir'));
+        $this->addTab($this->l('Promotions'), 'Promotions');
+        $this->addTab($this->l('Cards'), 'Cards');
+        $this->addTab($this->l('Banks'), 'Banks');
+    }
+    
+    // UNINSTALL TABS
+    public function uninstallTabs()
+    {
+        $dbx = _DB_PREFIX_;
+        $sql = "
+        SELECT id_tab FROM {$dbx}tab
+        WHERE module = '{$this->name}'";
+        $tabs = Db::getInstance()->executeS($sql);
+        foreach ($tabs as $t) {
+            $idt = $t['id_tab'];
+            $tab = new Tab($idt);
+            $tab->delete();
+        }
+    }
+    
+    // ADD MENU TAB
+    public function addTab($txt, $cls = '')
+    {
+        $tnm = 'AdminDecidir';
+        $pid = Tab::getIdFromClassName($tnm);
+        $tid = Tab::getIdFromClassName($tnm.$cls);
+        $lns = Language::getLanguages(false);
+        if (!$tid) {
+            $tab = new Tab();
+            $tab->class_name = $tnm.$cls;
+            $tab->module = $this->name;
+            $tab->id_parent = 0;
+            $cls && $tab->id_parent = $pid;
+            $cls && $tab->icon = 'settings';
+            foreach($lns as $ln){
+                $tab->name[$ln['id_lang']] = $txt;
+            }
+            $tab->save();
+        }
+    }
+    
+    // UPDATE CONFIG KEYS
+    private function updateKeys()
+    {
+        // Sandbox mode
+        if (Tools::getIsset('decidir-sbx')) {
+            $sbx = trim(Tools::getValue('decidir-sbx'));
+            Configuration::updateValue('DECIDIR_SBX', $sbx);
+        }
+        
+        // Production public key
+        if (Tools::getIsset('decidir-key-pub')) {
+            $key = trim(Tools::getValue('decidir-key-pub'));
+            Configuration::updateValue('DECIDIR_KEY_PUB', $key);
+        }
+        
+        // Production private key
+        if (Tools::getIsset('decidir-key-prv')) {
+            $tkn = trim(Tools::getValue('decidir-key-prv'));
+            Configuration::updateValue('DECIDIR_KEY_PRV', $tkn);
+        }
+        
+        // Sandbox public key
+        if (Tools::getIsset('decidir-key-pub-sbx')) {
+            $key = trim(Tools::getValue('decidir-key-pub-sbx'));
+            Configuration::updateValue('DECIDIR_KEY_PUB_SBX', $key);
+        }
+        
+        // Sandbox private key
+        if (Tools::getIsset('decidir-key-prv-sbx')) {
+            $tkn = trim(Tools::getValue('decidir-key-prv-sbx'));
+            Configuration::updateValue('DECIDIR_KEY_PRV_SBX', $tkn);
+        }
+        
+        // Production site ID
+        if (Tools::getIsset('decidir-sid')) {
+            $sid = trim(Tools::getValue('decidir-sid'));
+            Configuration::updateValue('DECIDIR_SID', $sid);
+        }
+        
+        // Sandbox site ID
+        if (Tools::getIsset('decidir-sid-sbx')) {
+            $sid = trim(Tools::getValue('decidir-sid-sbx'));
+            Configuration::updateValue('DECIDIR_SID_SBX', $sid);
+        }
+        
+        // Enable cybersource
+        if (Tools::getIsset('decidir-cbs')) {
+            $cbs = trim(Tools::getValue('decidir-cbs'));
+            Configuration::updateValue('DECIDIR_CBS', $cbs);
+        }
+        
+        // Merchant ID
+        if (Tools::getIsset('decidir-mrc')) {
+            $cbs = trim(Tools::getValue('decidir-mrc'));
+            Configuration::updateValue('DECIDIR_MRC', $cbs);
+        }
+        
+        // Vertical
+        if (Tools::getIsset('decidir-vrt')) {
+            $vrt = trim(Tools::getValue('decidir-vrt'));
+            Configuration::updateValue('DECIDIR_VRT', $vrt);
+        }
+        
+        // Payment option title
+        if (Tools::getIsset('decidir-ttl')) {
+            $nos = trim(Tools::getValue('decidir-ttl'));
+            Configuration::updateValue('DECIDIR_TTL', $nos);
         }
     }
     
@@ -227,68 +372,16 @@ class Decidir extends PaymentModule
         $data->cbs = Configuration::get('DECIDIR_CBS');
         $data->mrc = Configuration::get('DECIDIR_MRC');
         $data->vrt = Configuration::get('DECIDIR_VRT');
-        $data->crd = Configuration::get('DECIDIR_CRD');
-        $data->ins = Configuration::get('DECIDIR_INS');
         $data->ttl = Configuration::get('DECIDIR_TTL');
         if (!$data->ttl) {
             $data->ttl = $this->paymentMethodName;
         }
-    }
-    
-    // UPDATE CONFIG KEYS
-    private function updateKeys()
-    {
-        if (Tools::getIsset('decidir-sbx')) {
-            $sbx = trim(Tools::getValue('decidir-sbx'));
-            Configuration::updateValue('DECIDIR_SBX', $sbx);
-        }
-        if (Tools::getIsset('decidir-key-pub')) {
-            $key = trim(Tools::getValue('decidir-key-pub'));
-            Configuration::updateValue('DECIDIR_KEY_PUB', $key);
-        }
-        if (Tools::getIsset('decidir-key-prv')) {
-            $tkn = trim(Tools::getValue('decidir-key-prv'));
-            Configuration::updateValue('DECIDIR_KEY_PRV', $tkn);
-        }
-        if (Tools::getIsset('decidir-key-pub-sbx')) {
-            $key = trim(Tools::getValue('decidir-key-pub-sbx'));
-            Configuration::updateValue('DECIDIR_KEY_PUB_SBX', $key);
-        }
-        if (Tools::getIsset('decidir-key-prv-sbx')) {
-            $tkn = trim(Tools::getValue('decidir-key-prv-sbx'));
-            Configuration::updateValue('DECIDIR_KEY_PRV_SBX', $tkn);
-        }
-        if (Tools::getIsset('decidir-sid')) {
-            $sid = trim(Tools::getValue('decidir-sid'));
-            Configuration::updateValue('DECIDIR_SID', $sid);
-        }
-        if (Tools::getIsset('decidir-sid-sbx')) {
-            $sid = trim(Tools::getValue('decidir-sid-sbx'));
-            Configuration::updateValue('DECIDIR_SID_SBX', $sid);
-        }
-        if (Tools::getIsset('decidir-cbs')) {
-            $cbs = trim(Tools::getValue('decidir-cbs'));
-            Configuration::updateValue('DECIDIR_CBS', $cbs);
-        }
-        if (Tools::getIsset('decidir-mrc')) {
-            $cbs = trim(Tools::getValue('decidir-mrc'));
-            Configuration::updateValue('DECIDIR_MRC', $cbs);
-        }
-        if (Tools::getIsset('decidir-vrt')) {
-            $vrt = trim(Tools::getValue('decidir-vrt'));
-            Configuration::updateValue('DECIDIR_VRT', $vrt);
-        }
-        if (Tools::getIsset('decidir-crd')) {
-            $crd = implode(',', Tools::getValue('decidir-crd'));
-            Configuration::updateValue('DECIDIR_CRD', $crd);
-        }
-        if (Tools::getIsset('decidir-ins')) {
-            $ins = implode(',', Tools::getValue('decidir-ins'));
-            Configuration::updateValue('DECIDIR_INS', $ins);
-        }
-        if (Tools::getIsset('decidir-ttl')) {
-            $nos = trim(Tools::getValue('decidir-ttl'));
-            Configuration::updateValue('DECIDIR_TTL', $nos);
+        
+        // Obtain internal service key
+        $data->skey = Configuration::get('DECIDIR_SRV_KEY');
+        if (!$data->skey) {
+            $data->skey = bin2hex(time().uniqid());
+            Configuration::updateValue('DECIDIR_SRV_KEY', $data->skey);
         }
     }
     
@@ -305,8 +398,6 @@ class Decidir extends PaymentModule
         Configuration::deleteByName('DECIDIR_CBS');
         Configuration::deleteByName('DECIDIR_MRC');
         Configuration::deleteByName('DECIDIR_VRT');
-        Configuration::deleteByName('DECIDIR_CRD');
-        Configuration::deleteByName('DECIDIR_INS');
         Configuration::deleteByName('DECIDIR_TTL');
     }
     
@@ -345,17 +436,25 @@ class Decidir extends PaymentModule
     {
         $sts = array();
         foreach ($this->getOrderStates() as $ost) {
+            $i = $ost->id_order_state;
             $s = $ost->decidir_state;
+            $o = new OrderState($i);
+            $o->unremovable = 1;
+            $o->deleted = 0;
+            $o->save();
             array_push($sts, $s);
         }
-        if (!in_array('processing', $sts)) {
-            $this->createOrderState('processing', 'Decidir - Processing', true);
+        if (!in_array('review', $sts)) {
+            $this->createOrderState('review', 'Decidir - Review', true);
         }
         if (!in_array('approved', $sts)) {
             $this->createOrderState('approved', 'Decidir - Approved', true);
         }
         if (!in_array('rejected', $sts)) {
             $this->createOrderState('rejected', 'Decidir - Rejected', true);
+        }
+        if (!in_array('annulled', $sts)) {
+            $this->createOrderState('annulled', 'Decidir - Annulled', true);
         }
     }
     
@@ -372,7 +471,7 @@ class Decidir extends PaymentModule
         }
         $state->module_name = 'decidir';
         $state->color = '#19396C';
-        $state->unremovable = false;
+        $state->unremovable = 1;
         $state->paid = $paid;
         $dir = _PS_ROOT_DIR_;
         if ($state->add()) {
@@ -386,52 +485,195 @@ class Decidir extends PaymentModule
         Db::getInstance()->execute($sql);
     }
     
-    // GET PAYMENT METHODS
-    public function getPaymentMethods()
+    // DELETE ORDER STATES
+    public function deleteOrderStates()
     {
-        $methods = array();
-        
-        /*Debit*/
-        $methods['31']  = '['.$this->l('Debit').'] Visa';
-        $methods['105'] = '['.$this->l('Debit').'] MasterCard Prisma';
-        $methods['106'] = '['.$this->l('Debit').'] Maestro Prisma';
-        $methods['108'] = '['.$this->l('Debit').'] Cabal Prisma';
-        
-        /*Credit*/
-        $methods['1'] = 'Visa';
-        $methods['8'] = 'Diners Club';
-        $methods['23'] = 'Tarjeta Shopping';
-        $methods['24'] = 'Tarjeta Naranja';
-        $methods['25'] = 'PagoFacil';
-        $methods['26'] = 'RapiPago';
-        $methods['29'] = 'Italcred';
-        $methods['30'] = 'ArgenCard';
-        $methods['34'] = 'CoopePlus';
-        $methods['37'] = 'Nexo';
-        $methods['38'] = 'Credimás';
-        $methods['39'] = 'Tarjeta Nevada';
-        $methods['42'] = 'Nativa';
-        $methods['43'] = 'Tarjeta Cencosud';
-        $methods['44'] = 'Tarjeta Carrefour / Cetelem';
-        $methods['45'] = 'Tarjeta PymeNacion';
-        $methods['48'] = 'Caja de Pagos';
-        $methods['50'] = 'BBPS';
-        $methods['51'] = 'Cobro Express';
-        $methods['52'] = 'Qida';
-        $methods['54'] = 'Grupar';
-        $methods['55'] = 'Patagonia 365';
-        $methods['56'] = 'Tarjeta Club Día';
-        $methods['59'] = 'Tuya';
-        $methods['60'] = 'Distribution';
-        $methods['61'] = 'Tarjeta La Anónima';
-        $methods['62'] = 'CrediGuia';
-        $methods['63'] = 'Cabal Prisma';
-        $methods['64'] = 'Tarjeta SOL';
-        $methods['65'] = 'American Express';
-        $methods['103'] = 'Favacard';
-        $methods['104'] = 'MasterCard Prisma';
-        
-        return $methods;
+        foreach ($this->getOrderStates() as $ost) {
+            $s = $ost->id_order_state;
+            $ost = new OrderState($s);
+            $ost->deleted = 1;
+            $ost->save();
+        }
+    }
+    
+    // GET BANKS
+    public function getBanks()
+    {
+        $dbx = _DB_PREFIX_;
+        $sql = "SELECT * FROM {$dbx}decidir_banks";
+        $res = Db::getInstance()->executeS($sql);
+        $res = Tools::jsonEncode($res);
+        $res = Tools::jsonDecode($res);
+        return $res;
+    }
+    
+    // ADD BANK
+    public function addBank($cfg = array())
+    {
+        $tbl = 'decidir_banks';
+        Db::getInstance()->insert($tbl, $cfg);
+        $id = Db::getInstance()->Insert_ID();
+        Db::getInstance()->update($tbl, array(
+        'logo' =>"$id.jpg"), "id_bank = $id");
+        return $bid;
+    }
+    
+    // UPDATE BANK
+    public function updBank($id = 0, $cfg = array())
+    {
+        $id = (int) $id;
+        $tbl = 'decidir_banks';
+        $whr = "id_bank = $id";
+        Db::getInstance()->update($tbl, $cfg, $whr);
+        return $bid;
+    }
+    
+    // DELETE BANK
+    public function delBank($id = 0)
+    {
+        $id = (int) $id;
+        $tbl = 'decidir_banks';
+        $whr = "id_bank = $id";
+        Db::getInstance()->delete($tbl, $whr);
+        $pth = dirname(__FILE__);
+        @unlink("$pth/views/images/banks/$id.jpg");
+        return $bid;
+    }
+    
+    // GET CARDS
+    public function getCards()
+    {
+        $dbx = _DB_PREFIX_;
+        $sql = "SELECT * FROM {$dbx}decidir_cards";
+        $res = Db::getInstance()->executeS($sql);
+        $res = Tools::jsonEncode($res);
+        $res = Tools::jsonDecode($res);
+        return $res;
+    }
+    
+    // ADD CARD
+    public function addCard($cfg = array())
+    {
+        $tbl = 'decidir_cards';
+        Db::getInstance()->insert($tbl, $cfg);
+        $id = Db::getInstance()->Insert_ID();
+        Db::getInstance()->update($tbl, array(
+        'logo' =>"$id.jpg"), "id_card = $id");
+        return $id;
+    }
+    
+    // UPDATE CARD
+    public function updCard($id = 0, $cfg = array())
+    {
+        $id = (int) $id;
+        $tbl = 'decidir_cards';
+        $whr = "id_card = $id";
+        Db::getInstance()->update($tbl, $cfg, $whr);
+        return $id;
+    }
+    
+    // DELETE CARD
+    public function delCard($id = 0)
+    {
+        $id = (int) $id;
+        $tbl = 'decidir_cards';
+        $whr = "id_card = $id";
+        Db::getInstance()->delete($tbl, $whr);
+        $pth = dirname(__FILE__);
+        @unlink("$pth/views/images/cards/$id.jpg");
+        return $cid;
+    }
+    
+    // GET PROMOTIONS
+    public function getPromotions()
+    {
+        $prs = array();
+        $dbx = _DB_PREFIX_;
+        $sql = "
+        SELECT * FROM {$dbx}decidir_promotions
+        ORDER BY position ASC";
+        $res = Db::getInstance()->executeS($sql);
+        $res = Tools::jsonEncode($res);
+        $res = Tools::jsonDecode($res);
+        foreach ($res as $r) {
+            $r->banks = explode(',', $r->banks);
+            $r->cards = explode(',', $r->cards);
+            $r->shops = explode(',', $r->shops);
+            $r->applicable_days = explode(',', $r->applicable_days);
+            array_push($prs, $r);
+        }
+        return $prs;
+    }
+    
+    // ADD PROMOTION
+    public function addPromotion($cfg = array())
+    {
+        $tbl = 'decidir_promotions';
+        Db::getInstance()->insert($tbl, $cfg);
+        return Db::getInstance()->Insert_ID();
+    }
+    
+    // UPDATE PROMOTION
+    public function updPromotion($id = 0, $cfg = array())
+    {
+        $id = (int) $id;
+        $tbl = 'decidir_promotions';
+        $whr = "id_promotion = $id";
+        Db::getInstance()->update($tbl, $cfg, $whr);
+        return $id;
+    }
+    
+    // DELETE PROMOTION
+    public function delPromotion($id = 0)
+    {
+        $id = (int) $id;
+        Db::getInstance()->delete('decidir_installments', "id_promotion = $id");
+        Db::getInstance()->delete('decidir_promotions', "id_promotion = $id");
+        return $id;
+    }
+    
+    // GET INSTALLMENTS
+    public function getPromotionInstallments($arrange = false, $pro = 0)
+    {
+        $dbx = _DB_PREFIX_;
+        $sql = "
+        SELECT * FROM {$dbx}decidir_installments";
+        $pro && $sql .= "
+        WHERE id_promotion = $pro";
+        $arrange && $sql .= "
+        ORDER BY installment ASC";
+        $res = Db::getInstance()->executeS($sql);
+        $res = Tools::jsonEncode($res);
+        $res = Tools::jsonDecode($res);
+        return $res;
+    }
+    
+    // ADD INSTALLMENT
+    public function addPromotionInstallment($cfg = array())
+    {
+        $tbl = 'decidir_installments';
+        Db::getInstance()->insert($tbl, $cfg);
+        return Db::getInstance()->Insert_ID();
+    }
+    
+    // UPDATE INSTALLMENT
+    public function updPromotionInstallment($id = 0, $cfg = array())
+    {
+        $id = (int) $id;
+        $tbl = 'decidir_installments';
+        $whr = "id_installment = $id";
+        Db::getInstance()->update($tbl, $cfg, $whr);
+        return $id;
+    }
+    
+    // DELETE INSTALLMENT
+    public function delPromotionInstallment($id = 0)
+    {
+        $id = (int) $id;
+        $tbl = 'decidir_installments';
+        $whr = "id_installment = $id";
+        Db::getInstance()->delete($tbl, $whr);
+        return $id;
     }
     
     // API REQUESTS
@@ -458,5 +700,52 @@ class Decidir extends PaymentModule
         $res = Tools::jsonDecode($res);
         curl_close($curl);
         return $res;
+    }
+    
+    // UPLOAD IMAGES
+    public function imgUpload($ipt, $dir, $nam)
+    {
+        $out = false;
+        if ($fil = @$_FILES[$ipt]) {
+            $pth = dirname(__FILE__);
+            $dir = "$pth/$dir";
+            $fln = $fil['name'];
+            $prt = pathinfo($fln);
+            $fln = $prt['filename'];
+            $tmp = $fil['tmp_name'];
+            $typ = strtolower($fil['type']);
+            $img = false;
+            $typ == 'image/png' &&
+            $img = imagecreatefrompng($tmp);
+            $typ == 'image/gif' &&
+            $img = imagecreatefromgif($tmp);
+            $typ == 'image/jpg' &&
+            $img = imagecreatefromjpeg($tmp);
+            $typ == 'image/jpeg' &&
+            $img = imagecreatefromjpeg($tmp);
+            if ($img) {
+                $pth = "$dir/$nam.jpg";
+                @unlink($pth);
+                imagejpeg($img, $pth);
+            }
+            return $pth;
+        }
+    }
+    
+    // GET FORM VALUE AND PARSE AS DATE
+    public function getDateValue($key)
+    {
+        $val = Tools::getValue($key);
+        $val = new DateTime($val);
+        $val = $val->format('Y-m-d H:i:s');
+        return $val;
+    }
+    
+    // GET FORM MULTI VALUE AND IMPLODE
+    public function getMultiValue($key)
+    {
+        $val = Tools::getValue($key);
+        $val = implode(',', $val);
+        return $val;
     }
 }
