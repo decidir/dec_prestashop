@@ -158,6 +158,8 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
                     $this->loadPageTemplate('front', 'error', $data);
                 }
             } else {
+                
+                // Payment error
                 $this->loadPageTemplate('front', 'error', $data);
             }
         }
