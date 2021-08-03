@@ -66,29 +66,39 @@
                 <div class="row">
                     <div class="col-12 col-lg-12">
                         <div class="form-group">
-                            <label for="decidir-card-number">{l s='Credit card number' mod='decidir'}</label>
-                            <input type="text" id="decidir-card-number" class="form-control"
+                            <label for="decidir-card-number">{l s='Card number' mod='decidir'}</label>
+                            <input type="text" id="decidir-card-number" class="form-control" name="decidir-card-number-view"
                             value="" placeholder="**** **** **** ****" maxlength="24" required>
                             <input type="hidden" data-decidir="card_number" name="decidir-card-number" value="">
                         </div>
                     </div>
                 </div>
                 
-                <!-- PAYMENT METHOD -->
+                <!-- CARD AND ISSUER -->
                 <div class="row">
-                    <div class="col-12 col-lg-12">
+                    <div class="col-12 col-lg-6">
                         <div class="form-group">
-                            <label for="decidir-card-number">{l s='Issuer' mod='decidir'}</label>
+                            <label for="decidir-method-id">{l s='Card brand' mod='decidir'}</label>
                             <select id="decidir-method-id" data-decidir="type" name="decidir-method-id"
                             class="form-control" required>
-                                {foreach from=$data->mod->getPaymentMethods() key="i" item="it"}
-                                    {if (in_array($i, $data->crd))}
-                                    <option value="{$i}">{$it}</option>
-                                    {/if}
+                                {foreach from=$data->cards key="i" item="crd"}
+                                <option value="{$crd->id_card}" data-logo="{$data->url}modules/decidir/views/images/cards/{$crd->logo}">{$crd->name}</option>
                                 {/foreach}
                             </select>
                         </div>
                         <input type="hidden" id="decidir-method-name" name="decidir-method-name" value="">
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="form-group">
+                            <label for="decidir-issuer-id">{l s='Issuer' mod='decidir'}</label>
+                            <select id="decidir-issuer-id" name="decidir-issuer-id"
+                            class="form-control" required>
+                                {foreach from=$data->banks key="i" item="bnk"}
+                                <option value="{$bnk->id_bank}" data-logo="{$data->url}modules/decidir/views/images/banks/{$bnk->logo}">{$bnk->name}</option>
+                                {/foreach}
+                                <option value="0" data-logo="">{l s='Other' mod='decidir'}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
@@ -119,10 +129,9 @@
                             <label for="decidir-installments">{l s='Installments' mod='decidir'}</label>
                             <select id="decidir-installments" data-decidir="type" name="decidir-installments"
                             class="form-control" required>
-                                {foreach from=$data->ins item=i}
-                                <option value="{$i}">{$i}</option>
-                                {/foreach}
+                                
                             </select>
+                            <input type="hidden" id="decidir-installments-total" name="decidir-installments-total">
                         </div>
                     </div>
                 </div>
@@ -183,7 +192,79 @@ if (document.readyState != 'loading'){
     ('DOMContentLoaded', setOptionDecidir);
 }
 function setOptionDecidir() {
+    var srv = '{$data->srv nofilter}';
+    var cur = '{$data->curs}';
     setTimeout(function(){
+        
+        // Manage Installments
+        function addInstallment(ipt, cfg = {}) {
+            var opt = document.createElement('option');
+            var tot = parseFloat('{$data->total}');
+            var tos = cfg.installment_to_send;
+            var ins = cfg.installment;
+            var coe = cfg.coefficient;
+            var dis = cfg.discount;
+            dis = dis / 100;
+            tot = tot - tot * dis;
+            tot = tot * coe;
+            var amn = tot;
+            amn = (amn / ins).toFixed(2);
+            tot = tot.toFixed(2);
+            var txt = ins;
+            if (ins == 1) {
+                txt += " {l s='installment of' mod='decidir'}";
+            } else {
+                txt += " {l s='installments of' mod='decidir'}";
+            }
+            txt += " "+amn+cur+" ("+tot+cur+")";
+            $(opt).attr('value', tos);
+            $(opt).attr('data-total', tot);
+            $(opt).text(txt);
+            ipt.append(opt);
+            $('#decidir-installments').trigger('change');
+        }
+        
+        // Manage Promotions
+        function installmentPromotions() {
+            var ipt = $('#decidir-installments');
+            var shp = {$data->shp};
+            var mid = $('#decidir-method-id').val();
+            var bid = $('#decidir-issuer-id').val();
+            
+            ipt.empty();
+            $.post(srv+'&decidir-action=get-promotion-installments', {
+                shop: shp,
+                bank: bid,
+                card: mid
+            }, function(res){
+                ipt.empty();
+                if (!res.res.length) {
+                    addInstallment(ipt, {
+                        installment_to_send: 1,
+                        installment: 1,
+                        coefficient: 1,
+                        discount: 0
+                    })
+                } else {
+                    res.res.forEach(function(a, b){
+                        addInstallment(ipt, {
+                            installment_to_send: a.installment_to_send,
+                            installment: a.installment,
+                            coefficient: a.coefficient,
+                            discount: a.discount
+                        });
+                    });
+                }
+            });
+        }
+        $('#decidir-method-id').on('change', installmentPromotions);
+        $('#decidir-issuer-id').on('change', installmentPromotions);
+        $('#decidir-installments').on('change', function(){
+            var ipt = $(this);
+            var opt = ipt.find('option:selected');
+            var tot = opt.attr('data-total');
+            $('#decidir-installments-total').val(tot);
+        });
         
         // Manage doc number
         function docNumber() {
@@ -225,6 +306,30 @@ function setOptionDecidir() {
             ipt.trigger('change');
         } cardNumber();
         
+        // Manage payment method
+        function paymentMethod() {
+            var ipt = $('#decidir-method-id');
+            ipt.on('change', function(){
+                var txt = ipt.find('option:selected').text();
+                var lgo = ipt.find('option:selected').attr('data-logo');
+                ipt.css('background-image', 'url('+lgo+')');
+                $('#decidir-method-name').val(txt);
+            }); ipt.trigger('change');
+        } paymentMethod();
+        
+        // Manage Issuer
+        function issuerBank() {
+            var ipt = $('#decidir-issuer-id');
+            ipt.on('change', function(){
+                var lgo = ipt.find('option:selected').attr('data-logo');
+                if (lgo) {
+                    ipt.css('background-image', "url('"+lgo+"')");
+                } else {
+                    ipt.css('background-image', "");
+                }
+            }); ipt.trigger('change');
+        } issuerBank();
+        
         // Manage card expiration
         function cardExpiration() {
             var ipt = $('#decidir-expir');
@@ -261,37 +366,15 @@ function setOptionDecidir() {
             ipt.trigger('change');
         } cardCVV();
         
-        // Manage payment method
-        function paymentMethod() {
-            var ipt = $('#decidir-method-id');
-            ipt.on('change', function(){
-                var txt = ipt.find('option:selected').text();
-                $('#decidir-method-name').val(txt);
-                
-                // Change debit installments
-                var debits = [31,105,106,108];
-                var this_crd = parseInt(ipt.val());
-                var is_debit = $.inArray(this_crd, debits);
-                if (is_debit > -1) {
-                    $('#decidir-installments option').hide();
-                    $('#decidir-installments').val(1).change();       
-                    $('#decidir-installments option[value="1"]').show();
-                } else {
-                    $('#decidir-installments option').show();
-                }
-                
-            }); ipt.trigger('change');
-        } paymentMethod();
-        
         // VALIDATE AND SUBMIT
-        var decidir_valid = false;
+        var valid = false;
         var form = document.forms["decidir-form"];
         form.onsubmit = function() {
             $('.decidir-err').hide();
             $('.decidir-invalid').removeClass('decidir-invalid');
             decidir.createToken(form, function(sts, res){
                 if (sts == 200 || sts == 201) {
-                    decidir_valid = true;
+                    valid = true;
                     jQuery('#decidir-card-token').val(res.id);
                     jQuery('#decidir-card-bin').val(res.bin);
                     form.submit();
@@ -300,7 +383,7 @@ function setOptionDecidir() {
                     return false;
                 }
             });
-            if (!decidir_valid) {
+            if (!valid) {
                 jQuery('#payment-confirmation button').prop('disabled', 1);
                 return false;
             }
@@ -324,10 +407,30 @@ function setOptionDecidir() {
     font-weight: bold; 
     text-transform: uppercase;
 }
-.decidir-panel .decidir-invalid {
-    border: 1px solid red;
+#decidir-form input,
+#decidir-form select {
+    height: auto;
+    font-size: 12px;
+    padding: 6px 8px;
+    border-radius: 3px;
+    background-color: #fff;
 }
-.decidir-err {
-    color: red;
+#decidir-form input:focus,
+#decidir-form select:focus {
+    outline: 1px solid #2fb5d2;
+}
+#decidir-form select {
+    padding: 6px 3px;
+}
+#decidir-form label {
+    font-size: 12px;
+}
+#decidir-form #decidir-method-id,
+#decidir-form #decidir-issuer-id {
+    padding-left: 30px;
+    background-size: 21px;
+    background-repeat: no-repeat;
+    background-position: 4px center;
+    background-image:  url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MzE5QzczNjhCQTA3MTFFQkE2QUNERkFCMkUyRDVBN0QiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MzE5QzczNjlCQTA3MTFFQkE2QUNERkFCMkUyRDVBN0QiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDozMTlDNzM2NkJBMDcxMUVCQTZBQ0RGQUIyRTJENUE3RCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDozMTlDNzM2N0JBMDcxMUVCQTZBQ0RGQUIyRTJENUE3RCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pgq/hNMAAAAPSURBVHjaYjpz5gxAgAEABNQCZyQYsb8AAAAASUVORK5CYII=');
 }
 </style>
