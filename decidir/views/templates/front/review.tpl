@@ -1,5 +1,4 @@
-<?php
-/**
+{**
 * 2007 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -18,24 +17,21 @@
 * versions in the future. If you wish to customize PrestaShop for your
 * needs please refer to http://www.prestashop.com for more information.
 *
-*  @author    KaisarCode <info@kaisarcode.com>
-*  @copyright 2021 KaisarCode
+*  @author    IURCO <info@iurco.com>
+*  @copyright 2021 IURCO
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
-*/
+*}
 
-$dbx = _DB_PREFIX_;
-$sql = array();
+<div class="alert alert-success">
+    <strong>{l s='Your order is being reviewed' mod='decidir'}.</strong>
+    <p>{l s='We will confirm you once is completed' mod='decidir'}.</p>
+    <p style="margin-top: 20px;"><a class="btn btn-success" href="{$data->url}">{l s='Done' mod='decidir'}</a></p>
+</div>
 
-$sql[] = "DROP TABLE `{$dbx}decidir_cards`;";
-$sql[] = "DROP TABLE `{$dbx}decidir_banks`;";
-$sql[] = "DROP TABLE `{$dbx}decidir_promotions`;";
-
-// Execute sql
-foreach ($sql as $q) {
-    try {
-        Db::getInstance()->execute($q);
-    } catch (Exception $e) {
-        
-    }
+<script>
+// Prevent form resend
+if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
 }
+</script>
