@@ -28,8 +28,14 @@
     {if ($data->res->validation_errors)}
     <ul>
         {foreach from=$data->res->validation_errors item="error"}
-            {if ($error->code == 'invalid_param' && $error->param == 'payment_method_id')}
-            <li>{l s='Payment method invalid. Make sure your card and number are correct' mod='decidir'}.</li>
+            {if $error->code == 'invalid_param'}
+                {if $error->param == 'payment_method_id'}
+                <li>{l s='Payment method invalid. Make sure your card and number are correct' mod='decidir'}.</li>
+                {elseif $error->param == 'bin'}
+                <li>{l s='Credit card invalid. Make sure your card number is correct' mod='decidir'}.</li>
+                {else}
+                <li><b>{l s='Code' mod='decidir'}:</b> {$error->code} | <b>{l s='Detail' mod='decidir'}:</b> {$error->param}</li>
+                {/if}
             {else}
             <li><b>{l s='Code' mod='decidir'}:</b> {$error->code} | <b>{l s='Detail' mod='decidir'}:</b> {$error->param}</li>
             {/if}
