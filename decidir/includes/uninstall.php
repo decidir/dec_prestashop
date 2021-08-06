@@ -26,9 +26,11 @@
 
 $dbx = _DB_PREFIX_;
 $sql = array();
-$sql[] = "
-ALTER TABLE `{$dbx}order_state`
-DROP `decidir_state`;";
+
+$sql[] = "DROP TABLE `{$dbx}decidir_cards`;";
+$sql[] = "DROP TABLE `{$dbx}decidir_banks`;";
+$sql[] = "DROP TABLE `{$dbx}decidir_promotions`;";
+$sql[] = "DROP TABLE `{$dbx}decidir_installments`;";
 
 // Execute sql
 foreach ($sql as $q) {
