@@ -67,8 +67,7 @@ class AdminDecidirCardsController extends ModuleAdminController
         $cid = $mod->addCard(array(
             'name' => pSQL(Tools::getValue('decidir-new-card-name')),
             'id_sps' => (int)Tools::getValue('decidir-new-card-sps'),
-            'id_nps' => (int)Tools::getValue('decidir-new-card-nps'),
-            'active' => (int)Tools::getValue('decidir-new-card-active')
+            'id_nps' => (int)Tools::getValue('decidir-new-card-nps')
         ));
         if ($cid) {
             $ipt = 'decidir-new-card-logo';
@@ -86,8 +85,7 @@ class AdminDecidirCardsController extends ModuleAdminController
         $mod->updCard($cid, array(
             'name' => pSQL(Tools::getValue("decidir-upd-card-name-$cid")),
             'id_sps' => (int)Tools::getValue("decidir-upd-card-sps-$cid"),
-            'id_nps' => (int)Tools::getValue("decidir-upd-card-nps-$cid"),
-            'active' => (int)Tools::getValue("decidir-upd-card-active-$cid"),
+            'id_nps' => (int)Tools::getValue("decidir-upd-card-nps-$cid")
         ));
         $ipt = "decidir-upd-card-logo-$cid";
         $dir = 'views/images/cards';

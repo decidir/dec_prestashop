@@ -67,8 +67,7 @@ class AdminDecidirBanksController extends ModuleAdminController
     {
         $mod = $this->module;
         $bid = $mod->addBank(array(
-            'name' => pSQL(Tools::getValue('decidir-new-bank-name')),
-            'active' => (int)Tools::getValue('decidir-new-bank-active')
+            'name' => pSQL(Tools::getValue('decidir-new-bank-name'))
         ));
         if ($bid) {
             $ipt = 'decidir-new-bank-logo';
@@ -84,8 +83,7 @@ class AdminDecidirBanksController extends ModuleAdminController
         $mod = $this->module;
         $bid = (int)Tools::getValue('decidir-upd-bank');
         $mod->updBank($bid, array(
-            'name' => pSQL(Tools::getValue("decidir-upd-bank-name-$bid")),
-            'active' => (int)Tools::getValue("decidir-upd-bank-active-$bid")
+            'name' => pSQL(Tools::getValue("decidir-upd-bank-name-$bid"))
         ));
         $ipt = "decidir-upd-bank-logo-$bid";
         $dir = 'views/images/banks';

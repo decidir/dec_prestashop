@@ -132,7 +132,6 @@ class Decidir extends PaymentModule
         $data->total = $cart->getOrderTotal(true, Cart::BOTH);
         $data->cards = $this->getCards();
         $data->banks = $this->getBanks();
-
         $curr = new Currency($cart->id_currency);
         $data->curs = $curr->sign;
         $data->cart = $cart;
@@ -515,7 +514,7 @@ class Decidir extends PaymentModule
         $id = Db::getInstance()->Insert_ID();
         Db::getInstance()->update($tbl, array(
         'logo' =>"$id.jpg"), "id_bank = $id");
-        return $bid;
+        return $id;
     }
     
     // UPDATE BANK
@@ -525,7 +524,7 @@ class Decidir extends PaymentModule
         $tbl = 'decidir_banks';
         $whr = "id_bank = $id";
         Db::getInstance()->update($tbl, $cfg, $whr);
-        return $bid;
+        return $id;
     }
     
     // DELETE BANK
@@ -537,7 +536,7 @@ class Decidir extends PaymentModule
         Db::getInstance()->delete($tbl, $whr);
         $pth = dirname(__FILE__);
         @unlink("$pth/views/images/banks/$id.jpg");
-        return $bid;
+        return $id;
     }
     
     // GET CARDS
@@ -581,7 +580,7 @@ class Decidir extends PaymentModule
         Db::getInstance()->delete($tbl, $whr);
         $pth = dirname(__FILE__);
         @unlink("$pth/views/images/cards/$id.jpg");
-        return $cid;
+        return $id;
     }
     
     // GET PROMOTIONS
