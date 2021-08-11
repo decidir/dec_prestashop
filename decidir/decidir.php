@@ -78,8 +78,7 @@ class Decidir extends PaymentModule
         $data->shp = $data->ctx->shop->id;
         $data->ssl = Tools::usingSecureMode();
         $data->pay = $data->lnk->getModuleLink($this->name, 'payment', [], $data->ssl);
-        $data->srv = $data->lnk->getModuleLink($this->name, 'spromotions', [], $data->ssl);
-        $data->srv .= "&decidir-token={$data->skey}";
+        $data->srv = $data->lnk->getModuleLink($this->name, 'spromotions', ['decidir-token' => $data->skey], $data->ssl);
         
         return $data;
     }

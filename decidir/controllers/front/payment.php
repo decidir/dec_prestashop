@@ -94,7 +94,6 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             $data->cvv = Tools::getValue('decidir-cvv');*/
             
             
-
             // PS ORDER
             if (isset($res->id)) {
                 $status = $res->status;
