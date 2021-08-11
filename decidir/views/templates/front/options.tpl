@@ -247,6 +247,7 @@ function setOptionDecidir() {
                             installment_to_send: a.installment_to_send,
                             installment: a.installment,
                             coefficient: a.coefficient
+
                         });
                     });
                 }
