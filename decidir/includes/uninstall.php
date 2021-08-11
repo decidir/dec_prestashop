@@ -30,6 +30,7 @@ $sql = array();
 $sql[] = "DROP TABLE `{$dbx}decidir_cards`;";
 $sql[] = "DROP TABLE `{$dbx}decidir_banks`;";
 $sql[] = "DROP TABLE `{$dbx}decidir_promotions`;";
+$sql[] = "DROP TABLE `{$dbx}decidir_installments`;";
 
 // Execute sql
 foreach ($sql as $q) {

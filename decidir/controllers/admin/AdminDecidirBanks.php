@@ -85,7 +85,7 @@ class AdminDecidirBanksController extends ModuleAdminController
         $bid = (int)Tools::getValue('decidir-upd-bank');
         $mod->updBank($bid, array(
             'name' => pSQL(Tools::getValue("decidir-upd-bank-name-$bid")),
-            'active' => (int)Tools::getValue("decidir-upd-bank-name-$bid")
+            'active' => (int)Tools::getValue("decidir-upd-bank-active-$bid")
         ));
         $ipt = "decidir-upd-bank-logo-$bid";
         $dir = 'views/images/banks';

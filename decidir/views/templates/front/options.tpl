@@ -82,7 +82,7 @@
                             <select id="decidir-method-id" data-decidir="type" name="decidir-method-id"
                             class="form-control" required>
                                 {foreach from=$data->cards key="i" item="crd"}
-                                <option value="{$crd->id_card}" data-logo="{$data->url}modules/decidir/views/images/cards/{$crd->logo}">{$crd->name}</option>
+                                <option value="{$crd->id_sps}" data-logo="{$data->url}modules/decidir/views/images/cards/{$crd->logo}">{$crd->name}</option>
                                 {/foreach}
                             </select>
                         </div>
@@ -203,9 +203,6 @@ function setOptionDecidir() {
             var tos = cfg.installment_to_send;
             var ins = cfg.installment;
             var coe = cfg.coefficient;
-            var dis = cfg.discount;
-            dis = dis / 100;
-            tot = tot - tot * dis;
             tot = tot * coe;
             var amn = tot;
             amn = (amn / ins).toFixed(2);
@@ -242,16 +239,15 @@ function setOptionDecidir() {
                     addInstallment(ipt, {
                         installment_to_send: 1,
                         installment: 1,
-                        coefficient: 1,
-                        discount: 0
+                        coefficient: 1
                     })
                 } else {
                     res.res.forEach(function(a, b){
                         addInstallment(ipt, {
                             installment_to_send: a.installment_to_send,
                             installment: a.installment,
-                            coefficient: a.coefficient,
-                            discount: a.discount
+                            coefficient: a.coefficient
+
                         });
                     });
                 }

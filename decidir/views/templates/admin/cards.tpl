@@ -209,7 +209,7 @@
                             <!-- SPS -->
                             <div class="form-group decidir-col-form-group">
                                 <label>{l s='ID SPS' mod='decidir'}</label>
-                                <input type="text" name="decidir-new-card-sps-{$card->id_card}" value="{$card->id_sps|escape:'html'}">
+                                <input type="text" name="decidir-upd-card-sps-{$card->id_card}" value="{$card->id_sps|escape:'html'}">
                             </div>
                         </div>
                     </div>
@@ -219,7 +219,7 @@
                             <!-- NPS -->
                             <div class="form-group decidir-col-form-group">
                                 <label>{l s='ID NPS' mod='decidir'}</label>
-                                <input type="text" name="decidir-new-card-nps-{$card->id_card}" value="{$card->id_nps|escape:'html'}">
+                                <input type="text" name="decidir-upd-card-nps-{$card->id_card}" value="{$card->id_nps|escape:'html'}">
                             </div>
                         </div>
                     </div>

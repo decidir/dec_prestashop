@@ -130,8 +130,8 @@ class Decidir extends PaymentModule
         $data->fname = $cust->firstname;
         $data->lname = $cust->lastname;
         $data->total = $cart->getOrderTotal(true, Cart::BOTH);
-        $data->cards = $this->getCards();
-        $data->banks = $this->getBanks();
+        $data->cards = $this->getCards(true);
+        $data->banks = $this->getBanks(true);
         $curr = new Currency($cart->id_currency);
         $data->curs = $curr->sign;
         $data->cart = $cart;
@@ -158,8 +158,8 @@ class Decidir extends PaymentModule
         $data->fname = $cust->firstname;
         $data->lname = $cust->lastname;
         $data->total = $cart->getOrderTotal(true, Cart::BOTH);
-        $data->cards = $this->getCards();
-        $data->banks = $this->getBanks();
+        $data->cards = $this->getCards(true);
+        $data->banks = $this->getBanks(true);
         $curr = new Currency($cart->id_currency);
         $data->curs = $curr->sign;
         
@@ -496,10 +496,13 @@ class Decidir extends PaymentModule
     }
     
     // GET BANKS
-    public function getBanks()
+    public function getBanks($only_active = false)
     {
         $dbx = _DB_PREFIX_;
         $sql = "SELECT * FROM {$dbx}decidir_banks";
+        if ($only_active) {
+            $sql .= " WHERE active = 1";
+        }
         $res = Db::getInstance()->executeS($sql);
         $res = Tools::jsonEncode($res);
         $res = Tools::jsonDecode($res);
@@ -540,10 +543,13 @@ class Decidir extends PaymentModule
     }
     
     // GET CARDS
-    public function getCards()
+    public function getCards($only_active = false)
     {
         $dbx = _DB_PREFIX_;
         $sql = "SELECT * FROM {$dbx}decidir_cards";
+        if ($only_active) {
+            $sql .= " WHERE active = 1";
+        }
         $res = Db::getInstance()->executeS($sql);
         $res = Tools::jsonEncode($res);
         $res = Tools::jsonDecode($res);
@@ -584,13 +590,15 @@ class Decidir extends PaymentModule
     }
     
     // GET PROMOTIONS
-    public function getPromotions()
+    public function getPromotions($only_active = false)
     {
         $prs = array();
         $dbx = _DB_PREFIX_;
-        $sql = "
-        SELECT * FROM {$dbx}decidir_promotions
-        ORDER BY position ASC";
+        $sql = "SELECT * FROM {$dbx}decidir_promotions";
+        if ($only_active) {
+            $sql .= " WHERE active = 1";
+        }
+        $sql .= " ORDER BY position ASC";
         $res = Db::getInstance()->executeS($sql);
         $res = Tools::jsonEncode($res);
         $res = Tools::jsonDecode($res);

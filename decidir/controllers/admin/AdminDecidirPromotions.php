@@ -118,10 +118,6 @@ class AdminDecidirPromotionsController extends ModuleAdminController
                     "cft" => pSQL(Tools::getValue("decidir-new-installment-cft")[$i]),
                     "installment" => (int) Tools::getValue("decidir-new-installment-ins")[$i],
                     "coefficient" => pSQL(Tools::getValue("decidir-new-installment-coe")[$i]),
-                    "bank_refund" => pSQL(Tools::getValue("decidir-new-installment-bnk")[$i]),
-                    "bank_refund_unit" => pSQL(Tools::getValue("decidir-new-installment-bnk-unit")[$i]),
-                    "discount" => pSQL(Tools::getValue("decidir-new-installment-dis")[$i]),
-                    "discount_unit" => pSQL(Tools::getValue("decidir-new-installment-dis-unit")[$i]),
                     "installment_to_send" => (int) Tools::getValue("decidir-new-installment-tos")[$i],
                 ));
             }
@@ -145,10 +141,6 @@ class AdminDecidirPromotionsController extends ModuleAdminController
                             "cft" => pSQL(Tools::getValue("decidir-upd-installment-cft")[$i]),
                             "installment" => (int) Tools::getValue("decidir-upd-installment-ins")[$i],
                             "coefficient" => pSQL(Tools::getValue("decidir-upd-installment-coe")[$i]),
-                            "bank_refund" => pSQL(Tools::getValue("decidir-upd-installment-bnk")[$i]),
-                            "bank_refund_unit" => pSQL(Tools::getValue("decidir-upd-installment-bnk-unit")[$i]),
-                            "discount" => pSQL(Tools::getValue("decidir-upd-installment-dis")[$i]),
-                            "discount_unit" => pSQL(Tools::getValue("decidir-upd-installment-dis-unit")[$i]),
                             "installment_to_send" => (int) Tools::getValue("decidir-upd-installment-tos")[$i],
                         ));
                     } else {
@@ -157,10 +149,6 @@ class AdminDecidirPromotionsController extends ModuleAdminController
                             "cft" => pSQL(Tools::getValue("decidir-upd-installment-cft")[$i]),
                             "installment" => (int) Tools::getValue("decidir-upd-installment-ins")[$i],
                             "coefficient" => pSQL(Tools::getValue("decidir-upd-installment-coe")[$i]),
-                            "bank_refund" => pSQL(Tools::getValue("decidir-upd-installment-bnk")[$i]),
-                            "bank_refund_unit" => pSQL(Tools::getValue("decidir-upd-installment-bnk-unit")[$i]),
-                            "discount" => pSQL(Tools::getValue("decidir-upd-installment-dis")[$i]),
-                            "discount_unit" => pSQL(Tools::getValue("decidir-upd-installment-dis-unit")[$i]),
                             "installment_to_send" => (int) Tools::getValue("decidir-upd-installment-tos")[$i],
                         ));
                     }

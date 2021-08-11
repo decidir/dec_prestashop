@@ -87,7 +87,7 @@ class AdminDecidirCardsController extends ModuleAdminController
             'name' => pSQL(Tools::getValue("decidir-upd-card-name-$cid")),
             'id_sps' => (int)Tools::getValue("decidir-upd-card-sps-$cid"),
             'id_nps' => (int)Tools::getValue("decidir-upd-card-nps-$cid"),
-            'active' => (int)Tools::getValue("decidir-upd-card-name-$cid"),
+            'active' => (int)Tools::getValue("decidir-upd-card-active-$cid"),
         ));
         $ipt = "decidir-upd-card-logo-$cid";
         $dir = 'views/images/cards';

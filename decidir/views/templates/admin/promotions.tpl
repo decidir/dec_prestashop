@@ -239,8 +239,6 @@
                                         <th>{l s='Coefficient' mod='decidir'}</th>
                                         <th>{l s='%TEA' mod='decidir'}</th>
                                         <th>{l s='%CFT' mod='decidir'}</th>
-                                        <th>{l s='Bank refund' mod='decidir'}</th>
-                                        <th>{l s='Discount' mod='decidir'}</th>
                                         <th>{l s='Installment to send' mod='decidir'}</th>
                                         <th></th>
                                     </tr>
@@ -415,8 +413,6 @@
                                         <th>{l s='Coefficient' mod='decidir'}</th>
                                         <th>{l s='%TEA' mod='decidir'}</th>
                                         <th>{l s='%CFT' mod='decidir'}</th>
-                                        <th>{l s='Bank refund' mod='decidir'}</th>
-                                        <th>{l s='Discount' mod='decidir'}</th>
                                         <th>{l s='Installment to send' mod='decidir'}</th>
                                         <th></th>
                                     </tr>
@@ -459,18 +455,6 @@
 </td>
 <td class="decidir-installment-row-cft">
     <input type="number" step="0.01" class="form-control" value="0.00">
-</td>
-<td class="decidir-installment-row-bank-refund decidir-ipt-sel">
-    <input type="number" step="0.01" class="form-control" value="0.00">
-    <select class="form-control">
-        <option>%</option>
-    </select> 
-</td>
-<td class="decidir-installment-row-discount decidir-ipt-sel">
-    <input type="number" step="0.01" class="form-control" value="0.00">
-    <select class="form-control">
-        <option>%</option>
-    </select> 
 </td>
 <td class="decidir-installment-row-to-send">
     <input type="number" step="1" class="form-control" value="1">
@@ -517,12 +501,6 @@
     }
     .decidir-table-installments td:nth-of-type(4)::before {
         content: "{l s='%CFT' mod='decidir'}";
-    }
-    .decidir-table-installments td:nth-of-type(5)::before {
-        content: "{l s='Bank refund' mod='decidir'}";
-    }
-    .decidir-table-installments td:nth-of-type(6)::before {
-        content: "{l s='Discount' mod='decidir'}";
     }
     .decidir-table-installments td:nth-of-type(7)::before {
         content: "{l s='Installment to send' mod='decidir'}";
@@ -571,8 +549,6 @@ function decidirAddInstallmentRow(pfx, prn, opt) {
     var cell_coe = $(row).find('.decidir-installment-row-coefficient');
     var cell_tea = $(row).find('.decidir-installment-row-tea');
     var cell_cft = $(row).find('.decidir-installment-row-cft');
-    var cell_bnk = $(row).find('.decidir-installment-row-bank-refund');
-    var cell_dis = $(row).find('.decidir-installment-row-discount');
     var cell_tos = $(row).find('.decidir-installment-row-to-send');
     var del = $(row).find('.decidir-del-installment');
     var del_flag = $(row).find('.decidir-del-installment-flag');
@@ -585,11 +561,7 @@ function decidirAddInstallmentRow(pfx, prn, opt) {
     cell_coe.find('input').attr('name', 'decidir-'+pfx+'-installment-coe[]');
     cell_tea.find('input').attr('name', 'decidir-'+pfx+'-installment-tea[]');
     cell_cft.find('input').attr('name', 'decidir-'+pfx+'-installment-cft[]');
-    cell_bnk.find('input').attr('name', 'decidir-'+pfx+'-installment-bnk[]');
-    cell_dis.find('input').attr('name', 'decidir-'+pfx+'-installment-dis[]');
     cell_tos.find('input').attr('name', 'decidir-'+pfx+'-installment-tos[]');
-    cell_bnk.find('select').attr('name', 'decidir-'+pfx+'-installment-bnk-unit[]');
-    cell_dis.find('select').attr('name', 'decidir-'+pfx+'-installment-dis-unit[]');
     
     pro_flag.val(opt.pro);
     row_flag.val(opt.iid);
@@ -597,11 +569,7 @@ function decidirAddInstallmentRow(pfx, prn, opt) {
     cell_coe.find('input').val(opt.coe);
     cell_tea.find('input').val(opt.tea);
     cell_cft.find('input').val(opt.cft);
-    cell_bnk.find('input').val(opt.bnk);
-    cell_dis.find('input').val(opt.dis);
     cell_tos.find('input').val(opt.tos);
-    cell_bnk.find('select').val(opt.bnk_unit);
-    cell_dis.find('select').val(opt.dis_unit);
     
     del.on('click', function(){
         if (confirm("{l s='Delete installment?' mod='decidir'}")) {
@@ -623,11 +591,7 @@ function decidirAddNewInstallment(pfx, prn, pro) {
         tos: 1, // Installment to send
         coe: '1.00', // Coefficient
         tea: '0.00', // TEA
-        cft: '0.00', // CFT
-        bnk: '0.00', // Bank refund
-        dis: '0.00', // Discount
-        bnk_unit: '%', // Bank refund unit
-        dis_unit: '%' // Discount unit
+        cft: '0.00'  // CFT
     });
 }
 decidirAddNewInstallment('new', '#decidir-ins-rows-new', 0);
@@ -654,11 +618,7 @@ $('.decidir-upd-add-installment-{$promotion->id_promotion}').on('click', functio
         tos: {$ins->installment_to_send},
         coe: '{$ins->coefficient}',
         tea: '{$ins->tea}',
-        cft: '{$ins->cft}',
-        bnk: '{$ins->bank_refund}',
-        dis: '{$ins->discount}',
-        bnk_unit: '{$ins->bank_refund_unit}',
-        dis_unit: '{$ins->discount_unit}'
+        cft: '{$ins->cft}'
     });
 {/foreach}
 </script>

@@ -77,10 +77,6 @@ CREATE TABLE `{$dbx}decidir_installments` (
 `coefficient` VARCHAR(255) NOT NULL DEFAULT '1.00',
 `tea` VARCHAR(255) NOT NULL DEFAULT '0.00',
 `cft` VARCHAR(255) NOT NULL DEFAULT '0.00',
-`bank_refund` VARCHAR(255) NOT NULL DEFAULT '0.00',
-`bank_refund_unit` VARCHAR(1) NOT NULL DEFAULT '%',
-`discount` VARCHAR(255) NOT NULL DEFAULT '0.00',
-`discount_unit` VARCHAR(1) NOT NULL DEFAULT '%',
 `installment_to_send` VARCHAR(255) NOT NULL DEFAULT 1,
 PRIMARY KEY (`id_installment`)) ENGINE = $eng;";
 
