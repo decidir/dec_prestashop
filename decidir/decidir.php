@@ -132,6 +132,7 @@ class Decidir extends PaymentModule
         $data->total = $cart->getOrderTotal(true, Cart::BOTH);
         $data->cards = $this->getCards();
         $data->banks = $this->getBanks();
+
         $curr = new Currency($cart->id_currency);
         $data->curs = $curr->sign;
         $data->cart = $cart;
