@@ -38,7 +38,6 @@ CREATE TABLE `{$dbx}decidir_banks` (
 `id_bank` INT NOT NULL AUTO_INCREMENT,
 `name` VARCHAR(255) NOT NULL DEFAULT '',
 `logo` VARCHAR(255) NOT NULL DEFAULT '',
-`active` INT(1) NOT NULL DEFAULT '0',
 PRIMARY KEY (`id_bank`)) ENGINE = $eng;";
 
 // Create table cards
@@ -49,7 +48,6 @@ CREATE TABLE `{$dbx}decidir_cards` (
 `id_sps` INT(6) NOT NULL DEFAULT '0',
 `id_nps` INT(6) NOT NULL DEFAULT '0',
 `logo` VARCHAR(255) NOT NULL DEFAULT '',
-`active` INT(1) NOT NULL DEFAULT '0',
 PRIMARY KEY (`id_card`)) ENGINE = $eng;";
 
 // Create table promotions
@@ -83,46 +81,46 @@ PRIMARY KEY (`id_installment`)) ENGINE = $eng;";
 // Insert banks
 $sql[] = "
 INSERT INTO `{$dbx}decidir_banks`
-(`id_bank`, `name`, `logo`, `active`)
-VALUES (NULL, 'Ahora 12', 'default/ahora12.jpg', 1);";
+(`id_bank`, `name`, `logo`)
+VALUES (NULL, 'Ahora 12', 'default/ahora12.jpg');";
 $sql[] = "
 INSERT INTO `{$dbx}decidir_banks`
-(`id_bank`, `name`, `logo`, `active`)
-VALUES (NULL, 'Banco de Galicia y Buenos Aires S.A.', 'default/galicia.jpg', 1);";
+(`id_bank`, `name`, `logo`)
+VALUES (NULL, 'Banco de Galicia y Buenos Aires S.A.', 'default/galicia.jpg');";
 $sql[] = "
 INSERT INTO `{$dbx}decidir_banks`
-(`id_bank`, `name`, `logo`, `active`)
-VALUES (NULL, 'Banco de la Nación Argentina', 'default/nacion.jpg', 1);";
+(`id_bank`, `name`, `logo`)
+VALUES (NULL, 'Banco de la Nación Argentina', 'default/nacion.jpg');";
 $sql[] = "
 INSERT INTO `{$dbx}decidir_banks`
-(`id_bank`, `name`, `logo`, `active`)
-VALUES (NULL, 'Banco de la Provincia de Buenos Aires', 'default/bapro.jpg', 1);";
+(`id_bank`, `name`, `logo`)
+VALUES (NULL, 'Banco de la Provincia de Buenos Aires', 'default/bapro.jpg');";
 $sql[] = "
 INSERT INTO `{$dbx}decidir_banks`
-(`id_bank`, `name`, `logo`, `active`)
-VALUES (NULL, 'Standard Bank Argentina S.A. - ICBC', 'default/icbc.jpg', 1);";
+(`id_bank`, `name`, `logo`)
+VALUES (NULL, 'Standard Bank Argentina S.A. - ICBC', 'default/icbc.jpg');";
 $sql[] = "
 INSERT INTO `{$dbx}decidir_banks`
-(`id_bank`, `name`, `logo`, `active`)
-VALUES (NULL, 'CitiBank S.A.', 'default/citi.jpg', 1) ";
+(`id_bank`, `name`, `logo`)
+VALUES (NULL, 'CitiBank S.A.', 'default/citi.jpg') ";
 
 // Insert cards
 $sql[] = "
 INSERT INTO `{$dbx}decidir_cards`
-(`id_card`, `name`, `id_sps`, `id_nps`, `logo`, `active`)
-VALUES (NULL, 'VISA', 1, 14, 'default/visa.jpg', 1);";
+(`id_card`, `name`, `id_sps`, `id_nps`, `logo`)
+VALUES (NULL, 'VISA', 1, 14, 'default/visa.jpg');";
 $sql[] = "
 INSERT INTO `{$dbx}decidir_cards`
-(`id_card`, `name`, `id_sps`, `id_nps`, `logo`, `active`)
-VALUES (NULL, 'American Express', 65, 1, 'default/american.jpg', 1);";
+(`id_card`, `name`, `id_sps`, `id_nps`, `logo`)
+VALUES (NULL, 'American Express', 65, 1, 'default/american.jpg');";
 $sql[] = "
 INSERT INTO `{$dbx}decidir_cards`
-(`id_card`, `name`, `id_sps`, `id_nps`, `logo`, `active`)
-VALUES (NULL, 'Diners', 8, 2, 'default/diners.jpg', 1);";
+(`id_card`, `name`, `id_sps`, `id_nps`, `logo`)
+VALUES (NULL, 'Diners', 8, 2, 'default/diners.jpg');";
 $sql[] = "
 INSERT INTO `{$dbx}decidir_cards`
-(`id_card`, `name`, `id_sps`, `id_nps`, `logo`, `active`)
-VALUES (NULL, 'MasterCard', 15, 5, 'default/master.jpg', 1);";
+(`id_card`, `name`, `id_sps`, `id_nps`, `logo`)
+VALUES (NULL, 'MasterCard', 15, 5, 'default/master.jpg');";
 
 // Execute sql
 foreach ($sql as $q) {

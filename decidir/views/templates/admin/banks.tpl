@@ -46,7 +46,6 @@
                     <tr class="nodrag nodrop">
                         <th>{l s='Name' mod='decidir'}</th>
                         <th class="center fixed-width-xs">{l s='Logo' mod='decidir'}</th>
-                        <th class="center">{l s='Active' mod='decidir'}</th>
                         <th class="center fixed-width-xs">{l s='Action' mod='decidir'}</th>
                     </tr>
                 </thead>
@@ -63,13 +62,6 @@
                         <td class="center fixed-width-xs">
                             <div class="decidir-bank-logo-view"
                             style="background-image: url('{$data->url}modules/decidir/views/images/banks/{$bank->logo}?{uniqid()}')"></div>
-                        </td>
-                        <td class="center">
-                        {if $bank->active == 1}
-                            {l s='Yes' mod='decidir'}
-                        {else}
-                            {l s='No' mod='decidir'}
-                        {/if}
                         </td>
                         <td class="center fixed-width-xs" style="white-space: nowrap;">
                             <button type="button" name="decidir-cfg-bank"
@@ -133,22 +125,6 @@
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <!-- Active -->
-                            <div class="form-group decidir-col-form-group">
-                                <label>{l s='Active' mod='decidir'}</label>
-                                <span class="switch prestashop-switch fixed-width-lg">
-                                    <input id="decidir-new-bank-active-on" type="radio" name="decidir-new-bank-active" value="1" checked>
-                                    <label for="decidir-new-bank-active-on">{l s='Yes' mod='decidir'}</label>
-                                    <input id="decidir-new-bank-active-off" type="radio" name="decidir-new-bank-active" value="0">
-                                    <label for="decidir-new-bank-active-off">{l s='No' mod='decidir'}</label>
-                                    <a class="slide-button btn"></a>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default pull-left" data-dismiss="modal">
@@ -207,24 +183,6 @@
                                         </label>
                                     </span>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <!-- Name -->
-                            <div class="form-group decidir-col-form-group">
-                                <label>{l s='Active' mod='decidir'}</label>
-                                <span class="switch prestashop-switch fixed-width-lg">
-                                    <input id="decidir-upd-bank-active-on-{$bank->id_bank}"
-                                    type="radio" name="decidir-upd-bank-active-{$bank->id_bank}" value="1" {if $bank->active == 1}checked{/if}>
-                                    <label for="decidir-upd-bank-active-on-{$bank->id_bank}">{l s='Yes' mod='decidir'}</label>
-                                    <input id="decidir-upd-bank-active-off-{$bank->id_bank}"
-                                    type="radio" name="decidir-upd-bank-active-{$bank->id_bank}" value="0" {if $bank->active == 0}checked{/if}>
-                                    <label for="decidir-upd-bank-active-off-{$bank->id_bank}">{l s='No' mod='decidir'}</label>
-                                    <a class="slide-button btn"></a>
-                                </span>
                             </div>
                         </div>
                     </div>
