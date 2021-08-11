@@ -67,8 +67,15 @@ class DecidirSPromotionsModuleFrontController extends ModuleFrontController
             $out->res = array();
             $day = date('w');
             $shp = (int) Tools::getValue('shop');
-            $crd = (int) Tools::getValue('card');
             $bnk = (int) Tools::getValue('bank');
+            $crd = 0;
+            
+            // Get card id from card sps
+            $sps = (int) Tools::getValue('card');
+            $cdd = $modu->getCards("WHERE id_sps = $sps");
+            count($cdd) && $crd = (int) $cdd[0]->id_card;
+            
+            // Iterate promotions
             foreach ($modu->getPromotions() as $pro) {
                 $active = $pro->active;
                 $datefr = strtotime($pro->date_from);

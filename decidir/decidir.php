@@ -496,10 +496,10 @@ class Decidir extends PaymentModule
     }
     
     // GET BANKS
-    public function getBanks()
+    public function getBanks($whr = '')
     {
         $dbx = _DB_PREFIX_;
-        $sql = "SELECT * FROM {$dbx}decidir_banks";
+        $sql = "SELECT * FROM {$dbx}decidir_banks $whr";
         $res = Db::getInstance()->executeS($sql);
         $res = Tools::jsonEncode($res);
         $res = Tools::jsonDecode($res);
@@ -540,10 +540,10 @@ class Decidir extends PaymentModule
     }
     
     // GET CARDS
-    public function getCards()
+    public function getCards($whr = '')
     {
         $dbx = _DB_PREFIX_;
-        $sql = "SELECT * FROM {$dbx}decidir_cards";
+        $sql = "SELECT * FROM {$dbx}decidir_cards $whr";
         $res = Db::getInstance()->executeS($sql);
         $res = Tools::jsonEncode($res);
         $res = Tools::jsonDecode($res);

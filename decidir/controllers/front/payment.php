@@ -75,7 +75,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             $pmnt['currency'] = (string)$curr->iso_code;
             $pmnt['installments'] = (int)$prms['decidir-installments'];
             $pmnt['payment_type'] = 'single';
-            $pmnt['establishment_name'] = (string)$shop->name;
+            //$pmnt['establishment_name'] = (string)$shop->name;
             $pmnt['sub_payments'] = array();
             if ($data->cbs) {
                 require_once "{$data->pth}/includes/cbs-retail.php";
