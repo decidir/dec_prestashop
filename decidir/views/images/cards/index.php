@@ -1,4 +1,5 @@
-{**
+<?php
+/**
 * 2007 PrestaShop
 *
 * NOTICE OF LICENSE
@@ -21,16 +22,14 @@
 *  @copyright 2021 IURCO
 *  @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
 *  International Registered Trademark & Property of PrestaShop SA
-*}
+*/
 
-<div class="alert alert-warning">
-    <strong>{l s='Your payment was rejected.' mod='decidir'}.</strong>
-    <p style="margin-top: 20px; font-size: 12px;">{l s='Please check your payment information and try again' mod='decidir'}.</p>
-    <p style="margin-top: 20px;"><a class="btn btn-warning" href="javascript:history.back()">{l s='Return' mod='decidir'}</a></p>
-</div>
-<script>
-// Prevent form resend
-if (window.history.replaceState) {
-    window.history.replaceState(null, null, window.location.href);
-}
-</script>
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
+
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: post-check=0, pre-check=0', false);
+header('Pragma: no-cache');
+
+header('Location: ../');
+exit;
