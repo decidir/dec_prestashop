@@ -63,7 +63,6 @@ class DecidirSPromotionsModuleFrontController extends ModuleFrontController
         
         // GET PROMOTIONS
         if ($ac == 'get-promotion-installments' && $tk == $data->skey) {
-            
             $out->ok = 1;
             $out->res = array();
             $day = date('w');
