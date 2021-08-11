@@ -23,11 +23,12 @@
 *  International Registered Trademark & Property of PrestaShop SA
 *}
 
-<div class="alert alert-warning">
-    <strong>{l s='Your payment was rejected.' mod='decidir'}.</strong>
-    <p style="margin-top: 20px; font-size: 12px;">{l s='Please check your payment information and try again' mod='decidir'}.</p>
-    <p style="margin-top: 20px;"><a class="btn btn-warning" href="javascript:history.back()">{l s='Return' mod='decidir'}</a></p>
+<div class="alert alert-success">
+    <strong>{l s='Your order is being reviewed' mod='decidir'}.</strong>
+    <p>{l s='We will confirm you once is completed' mod='decidir'}.</p>
+    <p style="margin-top: 20px;"><a class="btn btn-success" href="{$data->url}">{l s='Done' mod='decidir'}</a></p>
 </div>
+
 <script>
 // Prevent form resend
 if (window.history.replaceState) {
