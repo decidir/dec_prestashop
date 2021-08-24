@@ -134,9 +134,6 @@ class Decidir extends PaymentModule
         $data->banks = $this->getBanks();
         $curr = new Currency($cart->id_currency);
         $data->curs = $curr->sign;
-        $data->cart = $cart;
-        $data->ins = explode(',', $data->ins);
-        $data->crd = explode(',', $data->crd);
         return $this->displayTpl('front/options', $data);
     }
     
@@ -363,10 +360,12 @@ class Decidir extends PaymentModule
         $data->key_pub = $data->key_pub_prd;
         $data->key_prv = $data->key_prv_prd;
         $data->sid = $data->sid_prd;
+        $data->env = "prod";
         if ($data->sbx) {
             $data->key_pub = $data->key_pub_sbx;
             $data->key_prv = $data->key_prv_sbx;
             $data->sid = $data->sid_sbx;
+            $data->env = "test";
         }
         $data->cbs = Configuration::get('DECIDIR_CBS');
         $data->mrc = Configuration::get('DECIDIR_MRC');
@@ -677,6 +676,16 @@ class Decidir extends PaymentModule
         return $id;
     }
     
+    // GENERATE FINGERPRINT
+    public function genFingerprint()
+    {
+        $data = $this->setUp();
+        $uid = $this->genUID();
+        $sid = $data->mrc.$uid;
+        $fgp = str_replace(" ", "", $sid);
+        return $sid.$fgp;
+    }
+    
     // API REQUESTS
     public function callAPI($ept = '', $prm = array())
     {
@@ -748,5 +757,21 @@ class Decidir extends PaymentModule
         $val = Tools::getValue($key);
         $val = implode(',', $val);
         return $val;
+    }
+    
+    // GENERATE UNIQUE IDENTIFIER
+    public function genUID()
+    {
+        $len = 64;
+        $chr = '';
+        $chr.= '_-';
+        $chr.= '0123456789';
+        $chr.= 'abcdefghijklmnopqrstuvwxyz';
+        $chr.= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $chl = strlen($chr);
+        $str = '';
+        for ($i = 0; $i < $len; $i++) {
+            $str .= $chr[rand(0, $chl - 1)];
+        } return time().$str;
     }
 }

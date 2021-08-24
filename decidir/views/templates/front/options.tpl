@@ -137,7 +137,7 @@
                 </div>
                 
                 <!-- CARD TOKEN -->
-                <input type="hidden" id="decidir-card-token" name="decidir-card-token" value="">
+                <input type="hidden" id="decidir-pay-token" name="decidir-pay-token" value="">
                 <input type="hidden" id="decidir-card-bin" name="decidir-card-bin" value="">
                 
                 <!-- ERROR MESSAGE -->
@@ -168,17 +168,19 @@
 <script src="https://live.decidir.com/static/v2.5/decidir.js"></script>
 {if $data->sbx}
 <script>
+var decidir_cbs = {(int)$data->cbs};
 var decidir_url = "https://developers.decidir.com/api/v2";
 var decidir_key = "{$data->key_pub}";
-var decidir = new Decidir(decidir_url);
+var decidir = new Decidir(decidir_url, !decidir_cbs);
 decidir.setTimeout(0);
 decidir.setPublishableKey(decidir_key);
 </script>
 {else}
 <script>
+var decidir_cbs = {(int)$data->cbs};
 var decidir_url = "https://live.decidir.com/api/v2";
 var decidir_key = "{$data->key_pub}";
-var decidir = new Decidir(decidir_url);
+var decidir = new Decidir(decidir_url, !decidir_cbs);
 decidir.setTimeout(5000);
 decidir.setPublishableKey(decidir_key);
 </script>
@@ -370,7 +372,7 @@ function setOptionDecidir() {
             decidir.createToken(form, function(sts, res){
                 if (sts == 200 || sts == 201) {
                     valid = true;
-                    jQuery('#decidir-card-token').val(res.id);
+                    jQuery('#decidir-pay-token').val(res.id);
                     jQuery('#decidir-card-bin').val(res.bin);
                     form.submit();
                 } else {
