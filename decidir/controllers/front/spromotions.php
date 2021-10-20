@@ -33,19 +33,19 @@ class DecidirSPromotionsModuleFrontController extends ModuleFrontController
         parent::initContent();
         $this->ajax = true;
     }
-    
+
     public function displayAjax()
     {
         header('Content-Type: application/json');
         $modu = $this->module;
         $data = $modu->setUp();
-        
+
         // PREPARE OUTPUT
         $out = new stdClass();
         $out->ok = 0;
         $out->res = null;
         $out->err = [];
-        
+
         // READ REQUEST BODY
         $ac = Tools::getValue('decidir-action');
         $tk = Tools::getValue('decidir-token');
@@ -54,28 +54,28 @@ class DecidirSPromotionsModuleFrontController extends ModuleFrontController
         if (!$in) {
             $in = new stdClass();
         }
-        
+
         // PING
         if ($ac == 'ping') {
             $out->ok = 1;
             $out->res = 42;
         }
-        
+
         // GET PROMOTIONS
         if ($ac == 'get-promotion-installments' && $tk == $data->skey) {
-            
+
             $out->ok = 1;
             $out->res = array();
             $day = date('w');
             $shp = (int) Tools::getValue('shop');
             $bnk = (int) Tools::getValue('bank');
             $crd = 0;
-            
+
             // Get card id from card sps
             $sps = (int) Tools::getValue('card');
             $cdd = $modu->getCards("WHERE id_sps = $sps");
             count($cdd) && $crd = (int) $cdd[0]->id_card;
-            
+
             // Iterate promotions
             foreach ($modu->getPromotions() as $pro) {
                 $active = $pro->active;
@@ -96,7 +96,7 @@ class DecidirSPromotionsModuleFrontController extends ModuleFrontController
                 }
             }
         }
-        
+
         // SHOW OUTPUT
         $data = Tools::jsonEncode($out);
         echo $data;

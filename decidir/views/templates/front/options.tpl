@@ -29,7 +29,7 @@
         <hr {if ($data->ver == 17)}style="margin: 10px 0;"{/if}>
         <div {if ($data->ver < 17)}class="row"{/if}>
             <div class="col-12 {if ($data->ver < 17)}col-lg-6{/if}">
-                
+
                 <!-- HOLDER NAME -->
                 <div class="row">
                     <div class="col-12 col-lg-12">
@@ -40,7 +40,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- DOC TYPE AND NUMBER-->
                 <div class="row">
                     <div class="col-12 col-lg-3">
@@ -61,7 +61,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- CARD NUMBER -->
                 <div class="row">
                     <div class="col-12 col-lg-12">
@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- CARD AND ISSUER -->
                 <div class="row">
                     <div class="col-12 col-lg-6">
@@ -101,7 +101,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- EXPIRATION DATE AND SECURITY CODE -->
                 <div class="row">
                     <div class="col-12 col-lg-6">
@@ -121,7 +121,7 @@
                     <input type="hidden" data-decidir="card_expiration_month" name="decidir-expir-m" value="">
                     <input type="hidden" data-decidir="card_expiration_year" name="decidir-expir-y" value="">
                 </div>
-                
+
                 <!-- INSTALLMENTS -->
                 <div class="row">
                     <div class="col-12 col-lg-12">
@@ -129,17 +129,17 @@
                             <label for="decidir-installments">{l s='Installments' mod='decidir'}</label>
                             <select id="decidir-installments" data-decidir="type" name="decidir-installments"
                             class="form-control" required>
-                                
+
                             </select>
                             <input type="hidden" id="decidir-installments-total" name="decidir-installments-total">
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- CARD TOKEN -->
                 <input type="hidden" id="decidir-pay-token" name="decidir-pay-token" value="">
                 <input type="hidden" id="decidir-card-bin" name="decidir-card-bin" value="">
-                
+
                 <!-- ERROR MESSAGE -->
                 <div class="row">
                     <div class="col-12 col-lg-12">
@@ -148,10 +148,10 @@
                         </div>
                     </div>
                </div>
-                
+
             </div>
         </div>
-        
+
         {if ($data->ver == 16)}
         <!-- SUBMIT -->
         <div>
@@ -161,7 +161,7 @@
             </button>
         </div>
         {/if}
-        
+
     </div>
 </form>
 
@@ -197,7 +197,7 @@ function setOptionDecidir() {
     var srv = '{$data->srv nofilter}';
     var cur = '{$data->curs}';
     setTimeout(function(){
-        
+
         // Manage Installments
         function addInstallment(ipt, cfg = {}) {
             var opt = document.createElement('option');
@@ -222,14 +222,14 @@ function setOptionDecidir() {
             ipt.append(opt);
             $('#decidir-installments').trigger('change');
         }
-        
+
         // Manage Promotions
         function installmentPromotions() {
             var ipt = $('#decidir-installments');
             var shp = {$data->shp};
             var mid = $('#decidir-method-id').val();
             var bid = $('#decidir-issuer-id').val();
-            
+
             ipt.empty();
             $.post(srv+'&decidir-action=get-promotion-installments', {
                 shop: shp,
@@ -262,7 +262,7 @@ function setOptionDecidir() {
             var tot = opt.attr('data-total');
             $('#decidir-installments-total').val(tot);
         });
-        
+
         // Manage doc number
         function docNumber() {
             var ipt = $('#decidir-doc-number');
@@ -278,7 +278,7 @@ function setOptionDecidir() {
             ipt.on('change', mask);
             ipt.trigger('change');
         } docNumber();
-        
+
         // Manage card number
         function cardNumber() {
             var ipt = $('#decidir-card-number');
@@ -302,7 +302,7 @@ function setOptionDecidir() {
             ipt.on('change', mask);
             ipt.trigger('change');
         } cardNumber();
-        
+
         // Manage payment method
         function paymentMethod() {
             var ipt = $('#decidir-method-id');
@@ -313,7 +313,7 @@ function setOptionDecidir() {
                 $('#decidir-method-name').val(txt);
             }); ipt.trigger('change');
         } paymentMethod();
-        
+
         // Manage Issuer
         function issuerBank() {
             var ipt = $('#decidir-issuer-id');
@@ -326,7 +326,7 @@ function setOptionDecidir() {
                 }
             }); ipt.trigger('change');
         } issuerBank();
-        
+
         // Manage card expiration
         function cardExpiration() {
             var ipt = $('#decidir-expir');
@@ -349,7 +349,7 @@ function setOptionDecidir() {
             ipt.on('change', mask);
             ipt.trigger('change');
         } cardExpiration();
-        
+
         // Manage CVV
         function cardCVV() {
             var ipt = $('#decidir-cvv');
@@ -362,7 +362,7 @@ function setOptionDecidir() {
             ipt.on('change', mask);
             ipt.trigger('change');
         } cardCVV();
-        
+
         // VALIDATE AND SUBMIT
         var valid = false;
         var form = document.forms["decidir-form"];
@@ -385,7 +385,7 @@ function setOptionDecidir() {
                 return false;
             }
         }
-        
+
     },0);
 }
 </script>
@@ -401,7 +401,7 @@ function setOptionDecidir() {
     margin-top: 0;
     color: #222222;
     font-size: 18px;
-    font-weight: bold; 
+    font-weight: bold;
     text-transform: uppercase;
 }
 #decidir-form input,

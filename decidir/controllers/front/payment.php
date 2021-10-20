@@ -28,7 +28,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
 {
     public $display_column_left = false;
     public $display_column_right = false;
-    
+
     public function initContent()
     {
         parent::initContent();
@@ -38,40 +38,40 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
         $cart = $this->context->cart;
         $prms = Tools::getAllValues();
         require "{$modu->path}/vendor/autoload.php";
-        
+
         if ($cart->orderExists()) {
             $this->loadPageTemplate('front', 'exists', $data);
         } else if (!Tools::getValue('decidir-pay-token')) {
             $this->loadPageTemplate('front', 'disallow', $data);
         } else {
             $data->tst = null;
-            
+
             $shop = new Shop($data->shp);
             $cust = new Customer($cart->id_customer);
             $curr = new Currency($cart->id_currency);
             $carr = new Carrier($cart->id_carrier);
-            
+
             // Billing address
             $bill_addr = new Address($cart->id_address_invoice);
             $bill_ctry = new Country($bill_addr->id_country);
             $bill_stat = new State($bill_addr->id_state);
-            
+
             // Shipping address
             $ship_addr = new Address($cart->id_address_delivery);
             $ship_ctry = new Country($ship_addr->id_country);
             $ship_stat = new State($ship_addr->id_state);
-            
+
             // Order data
             $prott = Tools::getValue('decidir-installments-total');
             $total = $cart->getOrderTotal(true, Cart::BOTH);
             $refer = Order::generateReference();
-            
+
             // Prepare Decidir payment
             $conn = new \Decidir\Connector(array(
                 'public_key' => $data->key_pub,
                 'private_key' => $data->key_prv
             ), $data->env, "IURCO - Prisma SA", "PrestaShop - Gateway DECIDIR", "SDK-PHP");
-            
+
             $pmnt = array();
             $pmnt['site_transaction_id'] = $refer;
             //$pmnt['establishment_name'] = (string)$shop->name;
@@ -83,14 +83,14 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             $pmnt['installments'] = (int)$prms['decidir-installments'];
             $pmnt['payment_type'] = 'single';
             $pmnt['sub_payments'] = array();
-            
+
             // Integrate Cybersource
             if ($data->cbs) {
                 require_once "{$data->pth}/includes/cbs-retail.php";
             }
-            
+
             try {
-                
+
                 // Execute Decidir payment
                 $res = $conn->payment()->ExecutePayment($pmnt);
                 $payid = $res->getId();
@@ -99,18 +99,18 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
                 $fraud = $fraud['status']['decision'];
                 $fraud == 'red' && $status = 'rejected';
                 $fraud == 'yellow' && $status = 'review';
-                
+
                 // Process PS data
                 if ($status == 'approved' || $status == 'review') {
                     $ost = $modu->getOrderState($status);
-                    
+
                     // Generate order
                     $modu->validateOrder($cart->id, $ost, $total, $data->ttl, null, [], null, false, $cart->secure_key);
                     $oid = Order::getOrderByCartId($cart->id);
                     $ord = new Order($oid);
                     $ord->reference = $refer;
                     $ord->save();
-                    
+
                     // Generate payment
                     $pay = new OrderPayment();
                     $pay->order_reference = $ord->reference;
@@ -122,7 +122,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
                     $pay->card_expiration = Tools::getValue('decidir-expir');
                     $pay->card_holder = Tools::getValue('decidir-holder');
                     $pay->save();
-                    
+
                     // Show approved view
                     if ($status == 'approved') {
                         //$this->loadPageTemplate('front', 'response', $data);
@@ -136,7 +136,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
                     if ($status == 'review') {
                         $this->loadPageTemplate('front', 'review', $data);
                     }
-                    
+
                 } else if ($status == 'rejected') {
                     $this->loadPageTemplate('front', 'rejected', $data);
                 } else if ($status == 'annulled') {
@@ -144,9 +144,9 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
                 } else {
                     $this->loadPageTemplate('front', 'error', $data);
                 }
-                
+
             } catch(\Exception $e) {
-                
+
                 // Catch Decidir errors
                 $data->res = $e->getData();
                 $data->res = Tools::jsonEncode($data->res);
@@ -155,7 +155,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             }
         }
     }
-    
+
     // LOAD PAGE TEMPLATE
     public function loadPageTemplate($ctrl, $tmpl, $data = null)
     {

@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 class AdminDecidirPromotionsController extends ModuleAdminController
 {
-    
+
     public $test = '';
     public function __construct()
     {
@@ -38,12 +38,12 @@ class AdminDecidirPromotionsController extends ModuleAdminController
        $this->bootstrap = true;
        $this->module = new Decidir();
     }
-    
+
     public function initContent()
     {
         parent::initContent();
     }
-    
+
     public function renderList()
     {
         $modu = $this->module;
@@ -65,7 +65,7 @@ class AdminDecidirPromotionsController extends ModuleAdminController
         $data->installments = $modu->getPromotionInstallments();
         return $this->module->displayTpl('admin/promotions', $data);
     }
-    
+
     // ADD PROMOTION
     public function addPromotion()
     {
@@ -84,7 +84,7 @@ class AdminDecidirPromotionsController extends ModuleAdminController
         ));
         $this->addPromotionInstallments($pro);
     }
-    
+
     // UPDATE PROMOTION
     public function updPromotion()
     {
@@ -104,7 +104,7 @@ class AdminDecidirPromotionsController extends ModuleAdminController
         ));
         $this->updPromotionInstallments($pro);
     }
-    
+
     // ADD INSTALLMENTS
     public function addPromotionInstallments($pro)
     {
@@ -123,7 +123,7 @@ class AdminDecidirPromotionsController extends ModuleAdminController
             }
         }
     }
-    
+
     // UPDATE INSTALLMENTS
     public function updPromotionInstallments($pro)
     {
