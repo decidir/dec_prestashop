@@ -34,11 +34,9 @@ if ($data->vrt == 'retail') {
     $pmnt['fraud_detection'] = array();
     $fd = &$pmnt['fraud_detection'];
     if ($data->sbx) {
-        $fd['device_unique_identifier'] = '12345';
+        $fd['device_unique_identifier'] = 'decidir_agregador';
     } else {
-        $fpr = $cart->id.uniqid();
-        $conc = str_replace($data->mrc.$fpr, '');
-        $fd['device_unique_identifier'] = md5($data->mrc.$fpr.$conc);
+        $fd['device_unique_identifier'] = $modu->genFingerprint();
     }
     $fd['send_to_cs'] = true;
     $fd['channel'] = 'Web';
@@ -60,7 +58,7 @@ if ($data->vrt == 'retail') {
     $cs['is_guest'] = $cust->isGuest();
     $cs['password'] = $cust->passwd;
     $sql = "
-    SELECT id_order FROM {$dbx}orders
+    SELECT id_order FROM "._DB_PREFIX_."orders
     WHERE id_customer = {$cust->id};";
     $tr = Db::getInstance()->executeS($sql);
     $cs['num_of_transactions'] = count($tr);
