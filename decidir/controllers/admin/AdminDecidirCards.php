@@ -36,12 +36,12 @@ class AdminDecidirCardsController extends ModuleAdminController
        $this->bootstrap = true;
        $this->module = new Decidir();
     }
-    
+
     public function initContent()
     {
         parent::initContent();
     }
-    
+
     public function renderList()
     {
         $modu = $this->module;
@@ -59,7 +59,7 @@ class AdminDecidirCardsController extends ModuleAdminController
         $data->cards = $modu->getCards();
         return $this->module->displayTpl('admin/cards', $data);
     }
-    
+
     // ADD CARD
     public function addCard()
     {
@@ -76,7 +76,7 @@ class AdminDecidirCardsController extends ModuleAdminController
         }
         return $cid;
     }
-    
+
     // UPDATE CARD
     public function updCard()
     {

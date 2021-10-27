@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 class AdminDecidirBanksController extends ModuleAdminController
 {
-    
+
     public $test = '';
     public function __construct()
     {
@@ -38,12 +38,12 @@ class AdminDecidirBanksController extends ModuleAdminController
        $this->bootstrap = true;
        $this->module = new Decidir();
     }
-    
+
     public function initContent()
     {
         parent::initContent();
     }
-    
+
     public function renderList()
     {
         $modu = $this->module;
@@ -61,7 +61,7 @@ class AdminDecidirBanksController extends ModuleAdminController
         $data->banks = $modu->getBanks();
         return $this->module->displayTpl('admin/banks', $data);
     }
-    
+
     // ADD BANK
     public function addBank()
     {
@@ -76,7 +76,7 @@ class AdminDecidirBanksController extends ModuleAdminController
         }
         return $bid;
     }
-    
+
     // UPDATE BANK
     public function updBank()
     {
