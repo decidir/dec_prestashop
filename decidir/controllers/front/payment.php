@@ -78,7 +78,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             $pmnt['token'] = (string)$prms['decidir-pay-token'];
             $pmnt['payment_method_id'] = (int)$prms['decidir-method-id'];
             $pmnt['bin'] = (string)$prms['decidir-card-bin'];
-            $pmnt['amount'] = (int)number_format($prott, 2, '', '');
+            $pmnt['amount'] = $prott;
             $pmnt['currency'] = (string)$curr->iso_code;
             $pmnt['installments'] = (int)$prms['decidir-installments'];
             $pmnt['payment_type'] = 'single';
