@@ -30,7 +30,7 @@ if (!defined('_PS_VERSION_')) {
 
 // Cybersource Retail
 if ($data->vrt == 'retail') {
-    
+
     $pmnt['fraud_detection'] = array();
     $fd = &$pmnt['fraud_detection'];
     if ($data->sbx) {
@@ -45,11 +45,11 @@ if ($data->vrt == 'retail') {
     $fd['customer_in_site'] = array();
     $fd['dispatch_method'] = $carr->name;
     $fd['retail_transaction_data'] = array();
-    
+
     $pt = &$fd['purchase_totals'];
     $pt['currency'] = $curr->iso_code;
-    $pt['amount'] = $pmnt['amount'];
-    
+    $pt['amount'] = (int)number_format($pmnt['amount'], 2, '', '');
+
     $cs = &$fd['customer_in_site'];
     $d1 = new DateTime($cust->date_add);
     $d2 = new DateTime('now');
@@ -62,7 +62,7 @@ if ($data->vrt == 'retail') {
     WHERE id_customer = {$cust->id};";
     $tr = Db::getInstance()->executeS($sql);
     $cs['num_of_transactions'] = count($tr);
-    
+
     $bt = &$fd['bill_to'];
     $bt['city'] = $bill_addr->city;
     $bt['state'] = $bill_stat->iso_code;
@@ -79,11 +79,11 @@ if ($data->vrt == 'retail') {
     } else {
         $bt['phone_number'] = $bill_addr->phone_mobile;
     }
-    
+
     $rt = &$fd['retail_transaction_data'];
     $rt['ship_to'] = array();
     $rt['items'] = array();
-    
+
     $st = &$rt['ship_to'];
     $st['city'] = $ship_addr->city;
     $st['state'] = $ship_stat->iso_code;
@@ -100,7 +100,7 @@ if ($data->vrt == 'retail') {
     } else {
         $st['phone_number'] = $ship_addr->phone_mobile;
     }
-    
+
     $it = &$rt['items'];
     $prods = $cart->getProducts();
     foreach ($prods as $p) {
@@ -123,4 +123,3 @@ if ($data->vrt == 'retail') {
         array_push($it, $item);
     }
 }
-            
