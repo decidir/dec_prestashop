@@ -26,6 +26,16 @@
 
 class DecidirPaymentModuleFrontController extends ModuleFrontController
 {
+
+    /** @var string Transaction platform origin service */
+    const CONNECTOR_SERVICE = 'SDK-PHP-IURCO-PRESTASHOP';
+
+    /** @var string Platform developer */
+    const CONNECTOR_DEVELOPER = 'IURCO - Prisma SA';
+
+    /** @var string Transaction origin prouper */
+    const CONNECTOR_GROUPER = 'PS-Gateway-DECIDIR';
+
     public $display_column_left = false;
     public $display_column_right = false;
 
@@ -70,7 +80,7 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
             $conn = new \Decidir\Connector(array(
                 'public_key' => $data->key_pub,
                 'private_key' => $data->key_prv
-            ), $data->env, "IURCO - Prisma SA", "PrestaShop - Gateway DECIDIR", "SDK-PHP");
+            ), $data->env, self::CONNECTOR_DEVELOPER, self::CONNECTOR_GROUPER, self::CONNECTOR_SERVICE);
 
             $pmnt = array();
             $pmnt['site_transaction_id'] = $refer;
