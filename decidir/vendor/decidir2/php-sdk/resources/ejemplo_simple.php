@@ -4,8 +4,10 @@ include_once dirname(__FILE__)."/../vendor/autoload.php";
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$keys_data = array('public_key' => 'e9cdb99fff374b5f91da4480c8dca741',
-		   'private_key' => '92b71cf711ca41f78362a7134f87ff65');
+$keys_data = array(
+				    'public_key' => '96e7f0d36a0648fb9a8dcb50ac06d260',
+		   		    'private_key' => '1b19bb47507c4a259ca22c12f78e881f'
+		   		);
 
 $ambient = "test";//valores posibles "test" o "prod"
 
@@ -15,7 +17,9 @@ echo("Healthcheck Service<br><br>");
 $response = $connector->healthcheck()->getStatus();
 
 echo("<br>Respuest healthcheck<br>");
+
 var_dump($response);
+
 echo("<br><br>");
 echo("Name: ".$response->getName())."<br>";
 echo("Version: ".$response->getVersion())."<br>";
@@ -26,24 +30,27 @@ echo("--------------------------------------------<br><br>");
 //------------------------ejecucion de pago--------------------------
 
 $data = array(
-			  "site_transaction_id" => "060718_03",
-			  "token" => "23a9ff0f-4c32-4f8c-9dd5-cdf24ca3e7ab",
+			  "site_transaction_id" => "ISA - Meze TEST",
+			  "token" => "ed42ee49-6b77-487a-a298-a153cd41073f",
 			  "customer" => array(
-			  					"id" => "usuario_prueba", 
-			  					"email" => "email@server.com",
-			  					"ip_address" => "192.168.100.2",
+			  					"id" => "morton",
+			  					"email" => "santiago.figueroa@redb.ee"
 			  					),
-			  "payment_method_id" => 1,
-			  "amount" => 12.00,
-			  "bin" => "450799",
+			  "payment_method_id" => 65,
+			  "amount" => 1000,
+			  "bin" => "373953",
 			  "currency" => "ARS",
 			  "installments" => 1,
-			  "description" => "prueba",
+			  "description" => "prueba qa",
 			  "payment_type" => "single",
-			  "establishment_name" => "Establecimiento test",
+			  "establishment_name" => "Prueba ISA-MEZE soft",
 			  "sub_payments" => array(),
-			  "fraud_detection" => array()
+			  "fraud_detection" => array(),
+			  "ip_address" => "192.168.100.2"
 );
+
+$response = $connector->payment()->ExecutePayment($data);
+var_dump($response);
 
 
 /*AMEX payment data
@@ -496,4 +503,121 @@ try {
 	echo("Error Respuest payment<br>");
 	var_dump($e->getData());
 }
+*/
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>validate>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><
+/*
+$data = array(
+	"site" => array(
+				"id" => "00021621", //opcional si no tengo merchant no se manda este campo
+				"transaction_id" => "Swatch test",
+				"template" => array(
+						"id" => 5 //valor 5 por defecto
+				),
+	),
+	"customer" => array(
+				"id" => "001",
+				"email" => "user@mail.com",
+	),
+	"payment" => array(
+				"amount" => 5.00,
+				"currency" => "ARS",
+				"payment_method_id" => 1,
+				"bin" => "45979",
+				"installments" => 4,
+				"payment_type" => "single",
+				"sub_payments" => array()
+
+	),
+	"success_url" => "https://shop.swatch.com/es_ar/",
+	"cancel_url" => "https://swatch.com/api/result",
+	"fraud_detection" => array()
+);
+*/
+//Cyberource
+//Datos Cybersource retail
+/*
+$cs_data = array(
+				"send_to_cs" => true,
+				"channel" => "Web",
+				"bill_to" => array(
+					"city" => "Buenos Aires",
+					"country" => "AR",
+					"customer_id" => "martinid",
+					"email" => "accept@decidir.com.ar",
+					"first_name" => "martin",
+					"last_name" => "perez",
+					"phone_number" => "1547766111",
+					"postal_code" => "1768",
+					"state" => "BA",
+					"street1" => "GARCIA DEL RIO 3333",
+					"street2" => "GARCIA DEL RIO 3333",
+				),
+				"ship_to" => array(
+					"city" => "Buenos Aires",
+					"country" => "AR",
+					"customer_id" => "martinid",
+					"email" => "accept@decidir.com.ar",
+					"first_name" => "martin",
+					"last_name" => "perez",
+					"phone_number" => "1547766111",
+					"postal_code" => "1768",
+					"state" => "BA",
+					"street1" => "GARCIA DEL RIO 3333",
+					"street2" => "GARCIA DEL RIO 3333",
+				),
+				"currency" => "ARS",
+				"amount" => 12.00,
+				"days_in_site" => 243,
+				"is_guest" => false,
+				"password" => "password",
+				"num_of_transactions" => 1,
+				"cellphone_number" => "12121",
+				"date_of_birth" => "129412",
+				"street" => "RIO 4041",
+				"days_to_delivery" => "55",
+				"dispatch_method" => "storepickup",
+				"tax_voucher_required" => true,
+				"customer_loyality_number" => "123232",
+				"coupon_code" => "cupon22",
+				"csmdd17" => "17"
+			);
+
+//lista de productos cybersource
+$cs_products = array(
+    array(
+        "csitproductcode" => "popblacksabbat2016",
+        "csitproductdescription" => "Popular Black Sabbath 2016",
+        "csitproductname" => "popblacksabbat2016ss",
+        "csitproductsku" => "asas",
+        "csittotalamount" => 6.00,
+        "csitquantity" => 1,
+        "csitunitprice" => 6.00
+    ),
+    array(
+        "csitproductcode" => "popblacksabbat2017",
+        "csitproductdescription" => "Popular Black Sabbath 2017",
+        "csitproductname" => "popblacksabbat2017ss",
+        "csitproductsku" => "asas",
+        "csittotalamount" => 6.00,
+        "csitquantity" => 1,
+        "csitunitprice" => 6.00
+    )
+);
+
+$cybersource = new \Decidir\Cybersource\Retail($cs_data, $cs_products);
+
+$connector->payment()->setCybersource($cybersource->getData());
+*/
+/*
+try {
+	$response = $connector->payment()->Validate($data);
+	echo("Respuest payment<br>");
+	print($response->getHash());
+
+} catch(\Exception $e) {
+	echo("Error Respuest payment<br>");
+	var_dump($e);
+}
+
 */
