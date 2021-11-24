@@ -38,7 +38,6 @@ if ($data->vrt == 'retail') {
 
     // Channel is always fixed to be `Web`
     $fraudDetection['channel'] = 'Web';
-    // $fraudDetection['bill_to'] = array();
     $fraudDetection['dispatch_method'] = $carr->name;
 
     // *****
