@@ -30,82 +30,135 @@ if (!defined('_PS_VERSION_')) {
 
 // Cybersource Retail
 if ($data->vrt == 'retail') {
-
     $pmnt['fraud_detection'] = array();
-    $fd = &$pmnt['fraud_detection'];
-    if ($data->sbx) {
-        $fd['device_unique_identifier'] = 'decidir_agregador';
-    } else {
-        $fd['device_unique_identifier'] = $modu->genFingerprint();
+    $fraudDetection = &$pmnt['fraud_detection'];
+
+    // Whether to send this data to Cybersource (always `true`)
+    $fraudDetection['send_to_cs'] = true;
+
+    // Channel is always fixed to be `Web`
+    $fraudDetection['channel'] = 'Web';
+    // $fraudDetection['bill_to'] = array();
+    $fraudDetection['dispatch_method'] = $carr->name;
+
+    // *****
+    // A note about `retail_transaction_data`
+    //
+    // Given this version isn't built on top of the SDK Data classes
+    // We need to strictly specify the `retail_transaction_data` with `ship_to` and `items` nodes
+    // cause this association occurs within the `Cybersource\AbstractData::construc()` method
+    //
+    // In a regular sceneario where this data layer relies on the SDK Data class,
+    // both keys (`ship_to` and `items`) would be assigned to the root array node.
+    // As `bill_to`, 'purchase_totals', field currently are.
+    // This will be refactored in futures version to avoid having this poorly data modeling
+    $fraudDetection['retail_transaction_data'] = array();
+
+    // *****
+    // Purchase Totals data set
+    $fraudDetection['purchase_totals'] = array(
+        'currency' => (string) $curr->iso_code,
+        'amount' => (int) number_format($pmnt['amount'], 2, '', '')
+    );
+
+
+    // *****
+    // Customer In Site data set
+    $customerInSite = array();
+    $customerIsGuest = $cust->isGuest();
+    $customerDaysInSite = 0;
+    $customerTransactionCount = 0;
+
+    // Retrieve the `customer_id`
+    // either send the registered Customer id
+    // or construct the value based on Customer Firstname and Lastname
+    $customerId = $customerIsGuest
+        ? (string) ($cust->firstname . '_' . $cust->lastname)
+        : (string) $cust->id;
+
+    // If it's a registered Customer
+    if (!$customerIsGuest) {
+        $d1 = new DateTime($cust->date_add);
+        $d2 = new DateTime('now');
+        $d3 = $d1->diff($d2);
+        $customerDaysInSite = $d3->format('%a');
+
+        // Retrieve Customer stats
+        // `nb_orders` will only take into account Paid and Completed Orders
+        // because it filters by `<database_prefix>_orders.valid` = 1
+        // @see Customer::getStats()
+        $customerStats = $cust->getStats();
+        $customerTransactionCount = $customerStats['nb_orders'];
     }
-    $fd['send_to_cs'] = true;
-    $fd['channel'] = 'Web';
-    $fd['bill_to'] = array();
-    $fd['purchase_totals'] = array();
-    $fd['customer_in_site'] = array();
-    $fd['dispatch_method'] = $carr->name;
-    $fd['retail_transaction_data'] = array();
 
-    $pt = &$fd['purchase_totals'];
-    $pt['currency'] = $curr->iso_code;
-    $pt['amount'] = (int)number_format($pmnt['amount'], 2, '', '');
+    $customerInSite = array(
+        'is_guest' => $customerIsGuest,
+        'days_in_site' => (int) $customerDaysInSite,
+        'num_of_transactions' => (int) $customerTransactionCount
+    );
 
-    $cs = &$fd['customer_in_site'];
-    $d1 = new DateTime($cust->date_add);
-    $d2 = new DateTime('now');
-    $d3 = $d1->diff($d2);
-    $cs['days_in_site'] = (int)$d3->format('%a');
-    $cs['is_guest'] = $cust->isGuest();
-    $cs['password'] = $cust->passwd;
-    $sql = "
-    SELECT id_order FROM "._DB_PREFIX_."orders
-    WHERE id_customer = {$cust->id};";
-    $tr = Db::getInstance()->executeS($sql);
-    $cs['num_of_transactions'] = count($tr);
+    $fraudDetection['customer_in_site'] = $customerInSite;
 
-    $bt = &$fd['bill_to'];
-    $bt['city'] = $bill_addr->city;
-    $bt['state'] = $bill_stat->iso_code;
-    $bt['country'] = $bill_ctry->iso_code;
-    $bt['customer_id'] = (string)$cust->id;
-    $bt['email'] = $cust->email;
-    $bt['first_name'] = $cust->firstname;
-    $bt['last_name'] = $cust->lastname;
-    $bt['street1'] = $bill_addr->address1;
-    $bt['street2'] = $bill_addr->address2;
-    $bt['postal_code'] = $ship_addr->postcode;
+
+    // *****
+    // Bill To data set
+    $billToAddress = array(
+        'city' => $bill_addr->city,
+        'state' => $bill_stat->iso_code,
+        'country' => $bill_ctry->iso_code,
+        'customer_id' => $customerId,
+        'email' => $cust->email,
+        'first_name' => $cust->firstname,
+        'last_name' => $cust->lastname,
+        'street1' => $bill_addr->address1,
+        'street2' => $bill_addr->address2,
+        'postal_code' => $bill_addr->postcode
+    );
+
+    // either send the telephone or mobile phone number
     if ($bill_addr->phone) {
-        $bt['phone_number'] = $bill_addr->phone;
+        $billPhoneNumber = $bill_addr->phone;
     } else {
-        $bt['phone_number'] = $bill_addr->phone_mobile;
+        $billPhoneNumber = $bill_addr->phone_mobile;
     }
+    $billToAddress['phone_number'] = $billPhoneNumber;
 
-    $rt = &$fd['retail_transaction_data'];
-    $rt['ship_to'] = array();
-    $rt['items'] = array();
+    $fraudDetection['bill_to'] = $billToAddress;
 
-    $st = &$rt['ship_to'];
-    $st['city'] = $ship_addr->city;
-    $st['state'] = $ship_stat->iso_code;
-    $st['country'] = $ship_ctry->iso_code;
-    $st['customer_id'] = (string)$cust->id;
-    $st['email'] = $cust->email;
-    $st['first_name'] = $cust->firstname;
-    $st['last_name'] = $cust->lastname;
-    $st['street1'] = $ship_addr->address1;
-    $st['street2'] = $ship_addr->address2;
-    $st['postal_code'] = $ship_addr->postcode;
+
+    // ******
+    // Builds Shipping Address data
+    $shipToAddress = array(
+        'city' => $ship_addr->city,
+        'state' => $ship_stat->iso_code,
+        'country' => $ship_ctry->iso_code,
+        'customer_id' => $customerId,
+        'email' => $cust->email,
+        'first_name' => $cust->firstname,
+        'last_name' => $cust->lastname,
+        'street1' => $ship_addr->address1,
+        'street2' => $ship_addr->address2,
+        'postal_code' => $ship_addr->postcode
+    );
+
     if ($ship_addr->phone) {
-        $st['phone_number'] = $ship_addr->phone;
+        $shipPhoneNumber = $ship_addr->phone;
     } else {
-        $st['phone_number'] = $ship_addr->phone_mobile;
+        $shipPhoneNumber = $ship_addr->phone_mobile;
     }
+    $shipToAddress['phone_number'] = $shipPhoneNumber;
 
-    $it = &$rt['items'];
+    $fraudDetection['retail_transaction_data']['ship_to'] = $shipToAddress;
+
+
+    // ******
+    // Build Order Items data
+    $items = array();
     $prods = $cart->getProducts();
     foreach ($prods as $p) {
         $p = Tools::jsonEncode($p);
         $p = Tools::jsonDecode($p);
+
         $item = array();
         $item['code'] = $p->reference;
         $item['sku'] = $p->reference;
@@ -120,6 +173,8 @@ if ($data->vrt == 'retail') {
         $item['total_amount'] = (int)number_format($total, 2, '', '');
         $item['unit_price'] = (int)number_format($p->price, 2, '', '');
         $item['quantity'] = (int)$p->quantity;
-        array_push($it, $item);
+
+        array_push($items, $item);
     }
+    $fraudDetection['retail_transaction_data']['items'] = $items;
 }

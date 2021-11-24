@@ -84,15 +84,26 @@ class DecidirPaymentModuleFrontController extends ModuleFrontController
 
             $pmnt = array();
             $pmnt['site_transaction_id'] = $refer;
-            //$pmnt['establishment_name'] = (string)$shop->name;
-            $pmnt['token'] = (string)$prms['decidir-pay-token'];
-            $pmnt['payment_method_id'] = (int)$prms['decidir-method-id'];
-            $pmnt['bin'] = (string)$prms['decidir-card-bin'];
+            $pmnt['token'] = (string) $prms['decidir-pay-token'];
+            $pmnt['payment_method_id'] = (int) $prms['decidir-method-id'];
+            $pmnt['bin'] = (string) $prms['decidir-card-bin'];
             $pmnt['amount'] = $prott;
-            $pmnt['currency'] = (string)$curr->iso_code;
-            $pmnt['installments'] = (int)$prms['decidir-installments'];
+            $pmnt['currency'] = (string) $curr->iso_code;
+            $pmnt['installments'] = (int) $prms['decidir-installments'];
             $pmnt['payment_type'] = 'single';
             $pmnt['sub_payments'] = array();
+            $pmnt['email'] = $cust->email;
+            $pmnt['ip_address'] = Tools::getRemoteAddr();
+
+            $customerId = $cust->isGuest()
+              ? (string) ($cust->firstname . '_' . $cust->lastname)
+              : (string) $cust->id;
+
+            $pmnt['customer'] = [
+                'id' => $customerId,
+                'email' => $cust->email,
+                'ip_address' => Tools::getRemoteAddr()
+            ];
 
             // Integrate Cybersource
             if ($data->cbs) {
