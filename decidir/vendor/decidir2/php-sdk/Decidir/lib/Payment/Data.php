@@ -6,6 +6,15 @@ class Data extends \Decidir\Data\AbstractData {
 	public function __construct(array $data) {
 
 		$this->setRequiredFields(array(
+			"id" => array(
+				"name" => ""
+			),
+			"email" => array(
+				"name" => "email"
+			),
+			"ip_address" => array(
+				"name" => "ip_address"
+			),
 			"site_transaction_id" => array(
 				"name" => "site_transaction_id"
 			),
@@ -24,9 +33,6 @@ class Data extends \Decidir\Data\AbstractData {
 			"currency" => array(
 				"name" => "currency"
 			),
-			"description" => array(
-				"name" => "description"
-			),
 			"installments" => array(
 				"name" => "installments"
 			),
@@ -34,24 +40,33 @@ class Data extends \Decidir\Data\AbstractData {
 				"name" => "payment_type"
 			),
 			"establishment_name" => array(
-				"name" => "establishment_name"
+				"name" => ""
 			),
 			"sub_payments" => array(
-				"name" => "sub_payments"
+				"name" => ""
 			),
 			"aggregate_data" => array(
-				"name" => "aggregate_data"
-			),
-			"fraud_detection" => array(
-				"name" => "fraud_detection"
+				"name" => ""
 			),
 			"customer" => array(
 				"name" => "customer"
 			),
 			"site_id" => array(
-				"name" => "site_id"
+				"name" => ""
 			),
 		));
+
+        $this->setOptionalFields(array(
+            "user_id" => array(
+                "name" => "user_id"
+            ),
+            "description" => array(
+                "name" => "description"
+            ),
+            "fraud_detection" => array(
+				"name" => "fraud_detection"
+			)
+        ));
 
 		parent::__construct($data);
 	}

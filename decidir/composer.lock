@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "decidir2/php-sdk",
-            "version": "V1.5.0",
+            "version": "v1.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/decidir/sdk-php-v2.git",
-                "reference": "d065c216cf0beb6ae436dd658c769e63a08b439c"
+                "reference": "ef5926e8613b8de3f78cc255184e65992f5e4ebc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/decidir/sdk-php-v2/zipball/d065c216cf0beb6ae436dd658c769e63a08b439c",
-                "reference": "d065c216cf0beb6ae436dd658c769e63a08b439c",
+                "url": "https://api.github.com/repos/decidir/sdk-php-v2/zipball/ef5926e8613b8de3f78cc255184e65992f5e4ebc",
+                "reference": "ef5926e8613b8de3f78cc255184e65992f5e4ebc",
                 "shasum": ""
             },
             "require": {
@@ -33,9 +33,9 @@
             "description": "SDK para Decidir",
             "support": {
                 "issues": "https://github.com/decidir/sdk-php-v2/issues",
-                "source": "https://github.com/decidir/sdk-php-v2/tree/V1.5.0"
+                "source": "https://github.com/decidir/sdk-php-v2/tree/v1.5.6"
             },
-            "time": "2018-07-17T18:32:01+00:00"
+            "time": "2021-11-09T14:59:01+00:00"
         }
     ],
     "packages-dev": [],

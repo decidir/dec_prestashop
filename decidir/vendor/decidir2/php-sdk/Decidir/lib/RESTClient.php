@@ -6,22 +6,40 @@ class RESTClient{
 	private $endpoint = NULL;
 	private $keys_data = array();
 	private $key = NULL;
+	private $formKey = NULL;
 	private $statusCodeResponse = array(200, 201, 204);
+	private $action = NULL;
+	public $jsonData = NULL;
+	public $service = NULL;
 
-	const DECIDIR_ENDPOINT_TEST = "https://developers.decidir.com/api/v2/";
-	const DECIDIR_ENDPOINT_PROD = "https://api.decidir.com/api/v2/";
+	const DECIDIR_ENDPOINT_TEST = "https://developers.decidir.com";
+	const DECIDIR_ENDPOINT_PROD = "https://api.decidir.com";
+	const DECIDIR_ENDPOINT_FORM_PROD = "https://live.decidir.com";
+	//const DECIDIR_ENDPOINT_TEST = "http://localhost:9001/";
 
-	public function __construct($keys_data_array, $mode = "test"){
+	public function __construct($keys_data_array, $mode = "test", $developer="", $grouper="", $service = "SDK-PHP"){
 		$this->keys_data = $keys_data_array;
+		$this->developer = $developer;
+        $this->grouper = $grouper;
+        $this->service = $service;
+
 		if($mode == "test") {
 			$this->endpoint = self::DECIDIR_ENDPOINT_TEST;
-		} elseif ($mode == "prod") {
-			$this->endpoint = self::DECIDIR_ENDPOINT_PROD;	
+		} elseif ($mode == "prod") {	
+			$this->endpoint = self::DECIDIR_ENDPOINT_PROD;
 		}
 	}
 
 	public function setUrl($url){
-		$this->url = $this->endpoint.$url;
+		if($url != 'validate'){
+			$this->endpoint = $this->endpoint.'/api/v2/'.$url;
+			//Para testing local es probable que se requiera modificar el concatenado del URL..
+			//$this->endpoint = $this->endpoint.$url;
+		}else{	
+			$this->endpoint = $this->endpoint.'/web/'.$url;
+		}
+
+		$this->url = $this->endpoint;
 	}
 
 	public function getUrl($url){
@@ -29,12 +47,17 @@ class RESTClient{
 	}
 
 	public function setKey($action){
+		$this->action = $action;
+
 		if($action == 'healthcheck'){
 			$this->key = "";
 
 		}elseif($action == 'tokens'){
 			$this->key = $this->keys_data['public_key'];
 
+		}elseif($action == 'validate'){
+			$this->key = $this->keys_data['form_apikey'];
+			$this->formKey = $this->keys_data['form_site'];
 		}else{
 			$this->key = $this->keys_data['private_key'];
 		}
@@ -67,13 +90,33 @@ class RESTClient{
 
 		return $this->RESTService("DELETE", $data);
 	}
+
+	public function encodeHeader64(){
+    	$jsonAux = json_encode(array('service' => $this->service, 'grouper'=> $this->grouper, 'developer'=> $this->developer));
+    	//echo("Json decoded---> <br><br><br><br><br><br><br>");
+    	//echo $jsonAux;
+    	//echo("Se encriptara el X-Source en base 64 <br><br><br><br><br><br><br> ");
+    	$this->jsonData = base64_encode($jsonAux);
+    	//echo("<br><br><br><br><br><br><br> X-Source Encodeado a base 64 <br><br><br><br><br><br><br>");
+    	//echo $this->jsonData;
+    }
+
 	//RESTResource
 	private function RESTService($method = "GET", $data, $query = array()){
+        $this->encodeHeader64();
 		$header_http = array(
-					'Cache-Control: no-cache',
-					'content-type: application/json',
-					'apikey:'. $this->key
+						'Cache-Control: no-cache',
+						'content-type: application/json',
+						'X-Consumer-Username:'.$this->formKey,
+						'X-Source:'.$this->jsonData,
 					);
+
+		if($this->action == 'validate'){
+			array_push($header_http, 'apikey: '. $this->key);
+			array_push($header_http, 'X-Consumer-Username: '. $this->formKey);
+		}else{
+			array_push($header_http, 'apikey: '. $this->key);
+		}	
 
 		$curl = curl_init();
 		$curl_post_data = array();
@@ -118,9 +161,9 @@ class RESTClient{
 			throw new \Exception($err);
 		}
 
-	        if($codeResponse == 204) {
-	                $response = '{"status":"success"}';
-	        }
+        if($codeResponse == 204) {
+                $response = '{"status":"success"}';
+        }
 		curl_close($curl);
 
 		return json_decode($response, true);

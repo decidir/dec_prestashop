@@ -6,12 +6,17 @@ class Payment{
 	public $serviceREST;
 	public $keys_data = array();
 	public $cybersource;
+	public $developer=NULL;
+    public $grouper=NULL;
+    public $service = NULL;
 
-	public function __construct($keys_data, $mode){
+	public function __construct($keys_data, $mode, $developer, $grouper, $service){
 		$this->keys_data = $keys_data;
 		$this->mode = $mode;
-
-		$this->serviceREST = new \Decidir\RESTClient($this->keys_data, $this->mode);
+		$this->developer = $developer;
+		$this->grouper = $grouper;
+		$this->service = $service;
+		$this->serviceREST = new \Decidir\RESTClient($this->keys_data, $this->mode, $developer, $grouper, $service);
 	}
 
 	public function ExecutePayment($data){
@@ -86,6 +91,19 @@ class Payment{
 		$RESTResponse = $this->serviceREST->get("payments/".$operationId, $jsonData->getData(), $query);
 		$ArrayResponse = $this->toArray($RESTResponse);
 		return new \Decidir\PaymentInfo\PaymentInfoResponse($ArrayResponse);
+	}
+
+	public function Validate($data){
+		$data['payment']['amount'] = $this->rmDecAmount($data['payment']['amount']);
+
+		if(!empty($this->cybersource) && $this->cybersource['send_to_cs'] == true){
+			$data['fraud_detection'] = json_decode(json_encode($this->cybersource),TRUE);
+		}
+
+		$jsonData = new \Decidir\Validate\Data($data);	
+		$RESTResponse = $this->serviceREST->post("validate", $jsonData->getData());
+		$ArrayResponse = $this->toArray($RESTResponse);
+		return new \Decidir\Validate\ValidateResponse($ArrayResponse);
 	}
 
 	public function Refund($data, $operationId){
