@@ -2,8 +2,7 @@
 Este módulo conecta su tienda PrestaShop con payway, permitiéndole procesar los pagos realizados en su tienda mediante esta plataforma.
 
 ### Compatible con
-- PrestaShop 1.6
-- PrestaShop 1.7
+- PrestaShop 1.7.8.2
 
 ### Instalación
 1. Tenga a mano el archivo payway.zip
