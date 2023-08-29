@@ -2,7 +2,7 @@
 Este módulo conecta su tienda PrestaShop con payway, permitiéndole procesar los pagos realizados en su tienda mediante esta plataforma.
 
 ### Compatible con
-- PrestaShop 1.6 - 1.7 - 1.7.8.2
+- PrestaShop 1.6 - 1.7 - 1.7.8.2 - 1.7.8.5 - 1.7.8.8
 
 ### Instalación
 1. Tenga a mano el archivo payway.zip
@@ -84,7 +84,8 @@ En el menú lateral de su Backoffice, se habilitará el grupo "PAYWAY", donde po
 ### Promociones
 - En el menú payway > Promociones, podrá administrar las promociones y condiciones de cuotas sobre los pedidos realizados.
 - Por defecto a todo pedido como mínimo se le asigna 1 cuota. Defina sus cuotas en esta sección según sea necesario.
-
+- Si se crea una promoción y posteriormente se elimina la tarjeta o banco que la conforman, la promoción no se visualizará.
+- Si no hay promociones configuradas, se muestran todos los bancos y tarjetas
 **Añadir promoción:**
 - En la esquina superior derecha de la tabla de promociones presione en el botón con el ícono "+".
 - Ingrese los datos requeridos en el formulario que se desplegará.
