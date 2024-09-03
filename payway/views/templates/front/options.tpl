@@ -62,14 +62,21 @@
                     </div>
                 </div>
 
-                <!-- CARD NUMBER -->
+                <!-- CARD NUMBER AND DOOR NUMBER -->
                 <div class="row">
-                    <div class="col-12 col-lg-12">
+                    <div class="col-6 col-lg-6">
                         <div class="form-group">
                             <label for="decidir-card-number">{l s='Card number' mod='payway'}</label>
                             <input type="text" id="decidir-card-number" class="form-control" name="decidir-card-number-view"
-                            value="" placeholder="**** **** **** ****" maxlength="24" required>
+                            value="" placeholder="   " maxlength="24" required>
                             <input type="hidden" data-decidir="card_number" name="decidir-card-number" value="">
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="decidir-door-number">{l s='Door number' mod='payway'}</label>
+                            <input type="text" id="decidir-door-number" class="form-control" name="decidir-door-number-view"
+                            value="" placeholder="Numero de puerta de facturacion" maxlength="5" required>
                         </div>
                     </div>
                 </div>
