@@ -62,9 +62,9 @@
                     </div>
                 </div>
 
-                <!-- CARD NUMBER AND DOOR NUMBER -->
+                <!-- CARD NUMBER -->
                 <div class="row">
-                    <div class="col-6 col-lg-6">
+                    <div class="col-12 col-lg-12">
                         <div class="form-group">
                             <label for="decidir-card-number">{l s='Card number' mod='payway'}</label>
                             <input type="text" id="decidir-card-number" class="form-control" name="decidir-card-number-view"
@@ -72,10 +72,22 @@
                             <input type="hidden" data-decidir="card_number" name="decidir-card-number" value="">
                         </div>
                     </div>
+                </div>
+
+                <!-- BILLING ADDRESS AND DOOR NUMBER -->
+                <div class="row">
                     <div class="col-6 col-lg-6">
                         <div class="form-group">
-                            <label for="decidir-door-number">{l s='Door number' mod='payway'}</label>
-                            <input type="text" id="decidir-door-number" class="form-control" name="decidir-door-number-view"
+                            <label for="decidir-address">{l s='Billing Address' mod='payway'}</label>
+                            <input type="text" id="decidir-address" class="form-control" name="decidir-address-view"
+                            value="" placeholder="   " maxlength="24" required>
+                            <input type="hidden" data-decidir="address" name="decidir-address" value="">
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="decidir-door-number">{l s='Altura de calle' mod='payway'}</label>
+                            <input type="text" data-decidir="card_holder_door_number" id="decidir-door-number" class="form-control" name="decidir-door-number-view"
                             value="" placeholder="Numero de puerta de facturacion" maxlength="5" required>
                         </div>
                     </div>
