@@ -78,7 +78,7 @@
                 <div class="row">
                     <div class="col-6 col-lg-6">
                         <div class="form-group">
-                            <label for="decidir-address">{l s='Billing Address' mod='payway'}</label>
+                            <label for="decidir-address">{l s='Dirección de Facturación' mod='payway'}</label>
                             <input type="text" id="decidir-address" class="form-control" name="decidir-address-view"
                             value="" placeholder="   " maxlength="24" required>
                             <input type="hidden" data-decidir="address" name="decidir-address" value="">

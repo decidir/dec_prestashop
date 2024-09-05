@@ -95,6 +95,8 @@ class PaywayPaymentModuleFrontController extends ModuleFrontController
             $pmnt['email'] = $cust->email;
             $pmnt['ip_address'] = Tools::getRemoteAddr();
 
+            $doorNumber = $prms['decidir-door-number'];
+
             $customerId = $cust->isGuest()
               ? (string) ($cust->firstname . '_' . $cust->lastname)
               : (string) $cust->id;

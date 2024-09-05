@@ -93,7 +93,8 @@ if ($data->vrt == 'retail') {
     $customerInSite = array(
         'is_guest' => $customerIsGuest,
         'days_in_site' => (int) $customerDaysInSite,
-        'num_of_transactions' => (int) $customerTransactionCount
+        'num_of_transactions' => (int) $customerTransactionCount,
+        'street' => $doorNumber
     );
 
     $fraudDetection['customer_in_site'] = $customerInSite;
