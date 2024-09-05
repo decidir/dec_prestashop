@@ -68,7 +68,7 @@
                         <div class="form-group">
                             <label for="decidir-card-number">{l s='Card number' mod='payway'}</label>
                             <input type="text" id="decidir-card-number" class="form-control" name="decidir-card-number-view"
-                            value="" placeholder="   " maxlength="24" required>
+                            value="" placeholder="**** **** **** ****" maxlength="24" required>
                             <input type="hidden" data-decidir="card_number" name="decidir-card-number" value="">
                         </div>
                     </div>
