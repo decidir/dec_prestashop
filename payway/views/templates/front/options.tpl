@@ -74,6 +74,25 @@
                     </div>
                 </div>
 
+                <!-- BILLING ADDRESS AND DOOR NUMBER -->
+                <div class="row">
+                    <div class="col-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="decidir-address">{l s='Dirección de Facturación' mod='payway'}</label>
+                            <input type="text" id="decidir-address" class="form-control" name="decidir-address-view"
+                            value="" placeholder="   " maxlength="24" required>
+                            <input type="hidden" data-decidir="address" name="decidir-address" value="">
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-6">
+                        <div class="form-group">
+                            <label for="decidir-door-number">{l s='Altura de calle' mod='payway'}</label>
+                            <input type="text" data-decidir="card_holder_door_number" id="decidir-door-number" class="form-control" name="decidir-door-number"
+                            value="" placeholder="Numero de puerta de facturacion" maxlength="5" required>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- CARD AND ISSUER -->
                 <div class="row">
                     <div class="col-12 col-lg-6">
