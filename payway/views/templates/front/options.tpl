@@ -87,7 +87,7 @@
                     <div class="col-6 col-lg-6">
                         <div class="form-group">
                             <label for="decidir-door-number">{l s='Altura de calle' mod='payway'}</label>
-                            <input type="text" data-decidir="card_holder_door_number" id="decidir-door-number" class="form-control" name="decidir-door-number-view"
+                            <input type="text" data-decidir="card_holder_door_number" id="decidir-door-number" class="form-control" name="decidir-door-number"
                             value="" placeholder="Numero de puerta de facturacion" maxlength="5" required>
                         </div>
                     </div>
